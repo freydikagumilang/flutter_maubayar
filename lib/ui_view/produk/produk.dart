@@ -17,7 +17,7 @@ class _ProdukState extends State<Produk> {
     TextEditingController txtcari = TextEditingController();
     return Scaffold(
       backgroundColor: FitnessAppTheme.tosca,
-      appBar: FrxAppBar("Produk"),
+      appBar: FrxAppBar("Produks"),
       floatingActionButton: FloatingActionButton(
         child: Icon(
           Icons.add,
