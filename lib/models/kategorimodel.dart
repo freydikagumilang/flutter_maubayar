@@ -1,8 +1,8 @@
 import 'package:maubayar/dbhelper.dart';
 
 class kategori {
-  int kat_id;
-  String _kat_nama;
+  int kat_id=0;
+  String _kat_nama="";
 
   kategori(
     this._kat_nama,

@@ -28,6 +28,8 @@ class DBHelper {
     
   }
   void _migrate(Database db, int oldVersion, int newVersion) async {
+    const initScript = ['Create table migrations (version INTEGER)','insert into migrations(0)']; // Initialization script split into seperate statements
+    initScript.forEach((script) async => await db.execute(script));
     print("migrate");
     const migrationScripts = [
       //'String query',

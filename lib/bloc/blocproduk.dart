@@ -1,25 +1,25 @@
 import 'package:maubayar/models/produkmodel.dart';
 import 'package:bloc/bloc.dart';
 
-class Createproduk extends Bloc<produk,int>{
+class Createproduk extends Bloc<produk,String>{
   final prodDAO = produkDAO();
 
-  Createproduk(int initialState) : super(initialState);
+  Createproduk(String initialState) : super(initialState);
 
   @override
-  Stream<int> mapEventToState(event)async* {
-    int id;
+  Stream<String> mapEventToState(event)async* {
     // TODO: implement mapEventToState
+    int id;
     try {
-      print(event.prod_id);
       if(event.prod_id!=0 && event.prod_id!=null){
-        id = await prodDAO.updateKat(event);
+        id = await prodDAO.updateProd(event);
       }else{        
         id = await prodDAO.saveProd(event);    
       }
-      
-      yield id;
+      print("save : "+id.toString());
+      yield "success";
     } catch (e) {
+      print(e);
     }
     
   }

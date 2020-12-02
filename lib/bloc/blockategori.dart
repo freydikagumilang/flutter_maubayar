@@ -34,6 +34,7 @@ class GetKategori extends Bloc<String, List<kategori>>{
   Stream<List<kategori>> mapEventToState(String event)async* {
     try {
       List<kategori> listprod = await katDAO.getKat(event);
+      print(listprod.length.toString());
       yield listprod;
     } catch (e) {
       print("error : ${e}");
