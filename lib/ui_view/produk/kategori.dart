@@ -4,6 +4,8 @@ import 'package:maubayar/bloc/blockategori.dart';
 import 'package:maubayar/fintness_app_theme.dart';
 import 'package:maubayar/models/kategorimodel.dart';
 import 'package:maubayar/ui_view/template/frxappbar.dart';
+import 'package:maubayar/txtformater.dart';
+import 'package:intl/intl.dart';
 
 class Kategori extends StatefulWidget {
   @override
@@ -11,7 +13,7 @@ class Kategori extends StatefulWidget {
 }
 
 class _KategoriState extends State<Kategori> {
-  List<kategori> kat = [kategori("")];
+  List<kategori> kat = [kategori("", 0.0)];
 
   @override
   Widget build(BuildContext context) {
@@ -33,10 +35,22 @@ class _KategoriState extends State<Kategori> {
           backgroundColor: FitnessAppTheme.yellow,
           onPressed: () async {
             AlertDialog inputdialog = AlertDialog(
-              title: Text("Input Kategori"),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Input Kategori"),
+                  GestureDetector(
+                    child: Icon(Icons.close),
+                    onTap: () {
+                      Navigator.pop(context, false);
+                    },
+                  ),
+                ],
+              ),
               content: InputKategori(),
             );
             final res = await showDialog(
+                barrierDismissible: false,
                 context: context,
                 builder: (BuildContext context) {
                   return BlocProvider<CreateKategori>.value(
@@ -66,6 +80,7 @@ class kategorilist extends StatefulWidget {
 
 // ignore: camel_case_types
 class _kategorilistState extends State<kategorilist> {
+  var NumFormat = NumberFormat("#,###", "id"); 
   @override
   void initState() {
     // TODO: implement initState
@@ -113,7 +128,7 @@ class _kategorilistState extends State<kategorilist> {
                         showBottomBorder: true,
                         columns: [
                           DataColumn(
-                              label: Text("Kategori",
+                              label: Text("Kategori - Komisi",
                                   style: TextStyle(fontSize: 20))),
                         ],
                         rows: List<DataRow>.generate(
@@ -144,15 +159,32 @@ class _kategorilistState extends State<kategorilist> {
                                                 onTap: () async {
                                                   AlertDialog inputdialog =
                                                       AlertDialog(
-                                                    title: Text(
-                                                        "Edit Kategori ${kat[index].kat_nama}"),
+                                                    title: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                            "Edit Kategori ${kat[index].kat_nama}"),
+                                                        GestureDetector(
+                                                          child:
+                                                              Icon(Icons.close),
+                                                          onTap: () {
+                                                            Navigator.pop(
+                                                                context, false);
+                                                          },
+                                                        ),
+                                                      ],
+                                                    ),
                                                     content: InputKategori(
                                                       editKat:
                                                           kat[index].kat_nama,
                                                       idKat: kat[index].kat_id,
+                                                      editKom: kat[index].kat_komisi,
                                                     ),
                                                   );
                                                   final res = await showDialog(
+                                                    barrierDismissible: false,
                                                       context: context,
                                                       builder: (BuildContext
                                                           context) {
@@ -176,7 +208,9 @@ class _kategorilistState extends State<kategorilist> {
                                                   padding: EdgeInsets.only(
                                                       right: 8)),
                                               Text(
-                                                kat[index].kat_nama,
+                                                kat[index].kat_nama +
+                                                    " - " +
+                                                    NumFormat.format(kat[index].kat_komisi).toString()+"%",
                                                 style: TextStyle(fontSize: 21),
                                               ),
                                             ],
@@ -201,11 +235,9 @@ class _kategorilistState extends State<kategorilist> {
                                                     );
                                                   });
                                               if (del) {
-                                                Navigator.pushReplacement(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (_) =>
-                                                            Kategori()));
+                                                GetKategori bloc = BlocProvider
+                                                    .of<GetKategori>(context);
+                                                bloc.add("");
                                               }
                                             },
                                             child: Icon(
@@ -227,26 +259,29 @@ class _kategorilistState extends State<kategorilist> {
 
 class InputKategori extends StatefulWidget {
   String editKat;
+  double editKom;
   int idKat = 0;
-  InputKategori({this.editKat, this.idKat = 0});
+  InputKategori({this.editKat, this.editKom, this.idKat = 0});
   @override
   _InputKategoriState createState() => _InputKategoriState();
 }
 
 class _InputKategoriState extends State<InputKategori> {
   final txtkategori = TextEditingController();
+  final txtkomisi = TextEditingController();
 
   @override
   void initState() {
     // TODO: implement initState
     txtkategori.text = widget.editKat;
+    if (widget.editKom != null) txtkomisi.text = widget.editKom.toString();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 130,
+      height: 205,
       child: BlocBuilder<CreateKategori, int>(
         builder: (context, idkat) => (Column(
             mainAxisSize: MainAxisSize.min,
@@ -257,6 +292,14 @@ class _InputKategoriState extends State<InputKategori> {
                   controller: txtkategori,
                   decoration: InputDecoration(
                       labelText: 'Nama Kategori',
+                      focusedBorder: UnderlineInputBorder(
+                          borderSide:
+                              BorderSide(color: FitnessAppTheme.tosca)))),
+              TextFormField(
+                  controller: txtkomisi,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                      labelText: 'Komisi (%)',
                       focusedBorder: UnderlineInputBorder(
                           borderSide:
                               BorderSide(color: FitnessAppTheme.tosca)))),
@@ -272,14 +315,16 @@ class _InputKategoriState extends State<InputKategori> {
                     if (widget.idKat != 0) {
                       CreateKategori creator =
                           BlocProvider.of<CreateKategori>(context);
-                      kategori edited = kategori((txtkategori.text).toString());
+                      kategori edited = kategori((txtkategori.text).toString(),
+                          double.parse(txtkomisi.text));
                       edited.setId(widget.idKat);
                       creator.add(edited);
                       Navigator.of(context).pop(true);
                     } else {
                       CreateKategori creator =
                           BlocProvider.of<CreateKategori>(context);
-                      creator.add(kategori((txtkategori.text).toString()));
+                      creator.add(kategori((txtkategori.text).toString(),
+                          double.parse(txtkomisi.text)));
                       Navigator.of(context).pop(true);
                     }
                   },

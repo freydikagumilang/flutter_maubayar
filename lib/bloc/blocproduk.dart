@@ -16,7 +16,6 @@ class Createproduk extends Bloc<produk,String>{
       }else{        
         id = await prodDAO.saveProd(event);    
       }
-      print("save : "+id.toString());
       yield "success";
     } catch (e) {
       print(e);

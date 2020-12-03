@@ -6,6 +6,7 @@ import 'package:maubayar/bloc/blocproduk.dart';
 import 'package:maubayar/fintness_app_theme.dart';
 import 'package:maubayar/models/kategorimodel.dart';
 import 'package:maubayar/models/produkmodel.dart';
+import 'package:maubayar/txtformater.dart';
 import 'package:maubayar/ui_view/produk/produk.dart';
 import 'package:maubayar/ui_view/template/frxappbar.dart';
 import 'package:intl/intl.dart';
@@ -19,7 +20,7 @@ class InputProduk extends StatefulWidget {
 }
 
 class _InputProdukState extends State<InputProduk> {
-  List<kategori> kat = [kategori("pilih kategori")];
+  List<kategori> kat = [kategori("pilih kategori",0.0)];
 
   @override
   Widget build(BuildContext context) {
@@ -44,29 +45,7 @@ class _InputProdukState extends State<InputProduk> {
   }
 }
 
-class NumericTextFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
-    if (newValue.text.isEmpty) {
-      return newValue.copyWith(text: '');
-    } else if (newValue.text.compareTo(oldValue.text) != 0) {
-      final int selectionIndexFromTheRight =
-          newValue.text.length - newValue.selection.end;
-      final f = NumberFormat("#,###", "id");
-      final number =
-          int.parse(newValue.text.replaceAll(f.symbols.GROUP_SEP, ''));
-      final newString = f.format(number);
-      return TextEditingValue(
-        text: newString,
-        selection: TextSelection.collapsed(
-            offset: newString.length - selectionIndexFromTheRight),
-      );
-    } else {
-      return newValue;
-    }
-  }
-}
+
 
 class InputForm extends StatefulWidget {
   final produk edit_prod;
@@ -126,21 +105,6 @@ class _InputFormState extends State<InputForm> {
                               isExpanded: true,
                               value: (snapshot.length > 0) ? selectedkat : null,
                               items: snapshot.map((item) {
-                                print("snapshoot : " +
-                                    snapshot.length.toString());
-                                if (widget.edit_prod != null) {
-                                  final bool hasil = (item.kat_id ==
-                                      widget.edit_prod.prod_kat_id);
-                                  print("hasil " +
-                                      item.kat_id.toString() +
-                                      " " +
-                                      item.kat_nama +
-                                      " == " +
-                                      widget.edit_prod.prod_kat_id.toString() +
-                                      " = " +
-                                      hasil.toString());
-                                }
-
                                 return DropdownMenuItem(
                                   child: Text(
                                     item.kat_nama,
