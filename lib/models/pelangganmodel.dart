@@ -24,7 +24,7 @@ class pelanggan {
   Map<String, dynamic> toMap() {
     var map = Map<String, dynamic>();
     map["pelanggan_nama"] = pelanggan_nama;
-    map["pelanggan_hp"] = pelanggan_hp;
+    map["pelanggan_hp"] = pelanggan_hp.toString();
     map["pelanggan_alamat"] = pelanggan_alamat;
 
     return map;
