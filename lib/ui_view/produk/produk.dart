@@ -18,7 +18,7 @@ class _ProdukState extends State<Produk> {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController txtcari = TextEditingController();
+    
     return MultiBlocProvider(
       providers: [
         BlocProvider<Getproduk>(create: (context) => Getproduk(listprod)),
@@ -26,7 +26,7 @@ class _ProdukState extends State<Produk> {
       ],
       child: Scaffold(
         backgroundColor: FitnessAppTheme.tosca,
-        appBar: FrxAppBar("Produks"),
+        appBar: FrxAppBar("Item/Layanan"),
         floatingActionButton: FloatingActionButton(
           child: Icon(
             Icons.add,
@@ -41,31 +41,7 @@ class _ProdukState extends State<Produk> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(5.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Card(
-                  color: FitnessAppTheme.white,
-                  child: TextFormField(
-                    controller: txtcari,
-                    style: TextStyle(fontSize: 20.0, color: Colors.black),
-                    decoration: InputDecoration(
-                        hintText: "Cari Produk",
-                        prefixIcon: Icon(
-                          Icons.search,
-                          color: FitnessAppTheme.tosca,
-                        )),
-                    onChanged: (val) {},
-                  )),
-              Expanded(
-                child: ListView(
-                  children: [
-                    Produklist(),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          child: Produklist()
         ),
       ),
     );
@@ -79,6 +55,7 @@ class Produklist extends StatefulWidget {
 
 class _ProduklistState extends State<Produklist> {
   var NumFormat = new NumberFormat.compact(locale: "id");
+  TextEditingController txtcari = TextEditingController();
 
   @override
   void initState() {
@@ -91,115 +68,157 @@ class _ProduklistState extends State<Produklist> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Card(
-        color: FitnessAppTheme.white,
-        child: BlocBuilder<Getproduk, List<produk>>(
-            builder: (context, dataprod) => DataTable(
-                dataRowHeight: 70,
-                showBottomBorder: true,
-                columns: [
-                  DataColumn(
-                      label: Text("Nama", style: TextStyle(fontSize: 20))),
-                  DataColumn(
-                      label: Text("Harga", style: TextStyle(fontSize: 20))),
-                  DataColumn(
-                    label: Icon(
-                      Icons.delete_forever,
-                      size: 30,
-                      color: FitnessAppTheme.redtext,
-                    ),
-                  ),
-                ],
-                rows: List<DataRow>.generate(
-                  ((dataprod == null) ? 0 : dataprod.length),
-                  (index) => DataRow(
-                      color: MaterialStateProperty.resolveWith<Color>(
-                          (Set<MaterialState> states) {
-                        if (states.contains(MaterialState.selected))
-                          return FitnessAppTheme.nearlyBlue;
-                        // Even rows will have a grey color.
-                        if (index % 2 == 0)
-                          return FitnessAppTheme.nearlyBlack.withOpacity(0.1);
-                        return null;
-                      }),
-                      cells: [
-                        DataCell(Padding(
-                          padding: const EdgeInsets.all(0.0),
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => InputProduk(
-                                            edit_prod: dataprod[index],
-                                          )));
-                            },
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.45,
-                                  child: Text(dataprod[index].prod_nama,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(fontSize: 20)),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.all(3),
-                                ),
-                                Text(
-                                  (dataprod[index].kat_nama != null)
-                                      ? dataprod[index].kat_nama
-                                      : "",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      color: FitnessAppTheme.grey),
-                                )
-                              ],
-                            ),
-                          ),
-                        )),
-                        DataCell(
-                          Text(
-                              NumFormat.format(dataprod[index].prod_price)
-                                  .toString(),
-                              style: TextStyle(fontSize: 23)),
-                        ),
-                        DataCell(
-                          GestureDetector(
-                              onTap: () async {
-                                AlertDialog delDialog = AlertDialog(
-                                  title: Text("Hapus Produk !"),
-                                  content: DeleteConfirmation(
-                                      dataprod[index].prod_nama,
-                                      dataprod[index].prod_id),
-                                );
-                                final del = await showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return BlocProvider<Deleteproduk>.value(
-                                        value: Deleteproduk(0),
-                                        child: delDialog,
-                                      );
-                                    });
-                                if (del) {
-                                  Getproduk bloc =
-                                      BlocProvider.of<Getproduk>(context);
-                                  bloc.add("");
-                                }
-                              },
-                              child: Icon(
+    Getproduk bloc = BlocProvider.of<Getproduk>(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Card(
+            color: FitnessAppTheme.white,
+            child: TextFormField(
+              controller: txtcari,
+              style: TextStyle(fontSize: 20.0, color: Colors.black),
+              decoration: InputDecoration(
+                  hintText: "Cari Produk",
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: FitnessAppTheme.tosca,
+                  )),
+              onChanged: (val) {
+                Future.delayed(Duration(milliseconds: 500), () {
+                  bloc.add(val);
+                });
+              },
+            )),
+        Expanded(
+          child: ListView(
+            children: [
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Card(
+                  color: FitnessAppTheme.white,
+                  child: BlocBuilder<Getproduk, List<produk>>(
+                      builder: (context, dataprod) => DataTable(
+                          dataRowHeight: 70,
+                          showBottomBorder: true,
+                          columns: [
+                            DataColumn(
+                                label: Text("Nama",
+                                    style: TextStyle(fontSize: 20))),
+                            DataColumn(
+                                label: Text("Harga",
+                                    style: TextStyle(fontSize: 20))),
+                            DataColumn(
+                              label: Icon(
                                 Icons.delete_forever,
                                 size: 30,
                                 color: FitnessAppTheme.redtext,
-                              )),
-                        ),
-                      ]),
-                ))),
-      ),
+                              ),
+                            ),
+                          ],
+                          rows: List<DataRow>.generate(
+                            ((dataprod == null) ? 0 : dataprod.length),
+                            (index) => DataRow(
+                                color: MaterialStateProperty.resolveWith<Color>(
+                                    (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.selected))
+                                    return FitnessAppTheme.nearlyBlue;
+                                  // Even rows will have a grey color.
+                                  if (index % 2 == 0)
+                                    return FitnessAppTheme.nearlyBlack
+                                        .withOpacity(0.1);
+                                  return null;
+                                }),
+                                cells: [
+                                  DataCell(Padding(
+                                    padding: const EdgeInsets.all(0.0),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    InputProduk(
+                                                      edit_prod:
+                                                          dataprod[index],
+                                                    )));
+                                      },
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.45,
+                                            child: Text(
+                                                dataprod[index].prod_nama,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(fontSize: 20)),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.all(3),
+                                          ),
+                                          Text(
+                                            (dataprod[index].kat_nama != null)
+                                                ? dataprod[index].kat_nama
+                                                : "",
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                color: FitnessAppTheme.grey),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  )),
+                                  DataCell(
+                                    Text(
+                                        NumFormat.format(
+                                                dataprod[index].prod_price)
+                                            .toString(),
+                                        style: TextStyle(fontSize: 23)),
+                                  ),
+                                  DataCell(
+                                    GestureDetector(
+                                        onTap: () async {
+                                          AlertDialog delDialog = AlertDialog(
+                                            title: Text("Hapus Produk !"),
+                                            content: DeleteConfirmation(
+                                                dataprod[index].prod_nama,
+                                                dataprod[index].prod_id),
+                                          );
+                                          final del = await showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return BlocProvider<
+                                                    Deleteproduk>.value(
+                                                  value: Deleteproduk(0),
+                                                  child: delDialog,
+                                                );
+                                              });
+                                          if (del) {
+                                            Getproduk bloc =
+                                                BlocProvider.of<Getproduk>(
+                                                    context);
+                                            bloc.add("");
+                                          }
+                                        },
+                                        child: Icon(
+                                          Icons.delete_forever,
+                                          size: 30,
+                                          color: FitnessAppTheme.redtext,
+                                        )),
+                                  ),
+                                ]),
+                          ))),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
