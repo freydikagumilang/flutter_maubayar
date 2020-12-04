@@ -10,21 +10,25 @@ class MasterData extends StatefulWidget {
 class _MasterDataState extends State<MasterData> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-          appBar: AppBar(
-            backgroundColor: FitnessAppTheme.tosca,
-            elevation: 0,
-            title: Center(
-                child: Text(
-              "Master Data",
-              style: TextStyle(fontSize: 25, color: FitnessAppTheme.white),
-            )),
-          ),
-          body: Container(
-            color: FitnessAppTheme.tosca,
-            child: MenuBuilder(),
-          ),
-        );
+    return WillPopScope(
+     onWillPop: ()async=>false,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: FitnessAppTheme.tosca,
+          automaticallyImplyLeading: false,
+          elevation: 0,
+          title: Center(
+              child: Text(
+            "Master Data",
+            style: TextStyle(fontSize: 25, color: FitnessAppTheme.white),
+          )),
+        ),
+        body: Container(
+          color: FitnessAppTheme.tosca,
+          child: MenuBuilder(),
+        ),
+      ),
+    );
   }
 }
 
@@ -48,7 +52,8 @@ class _MenuBuilderState extends State<MenuBuilder> {
         itemBuilder: (BuildContext context, int id) {
           return GestureDetector(
             onTap: () {
-              Navigator.of(context, rootNavigator: true).pushNamed(_menumaster[id].direction);
+              Navigator.of(context, rootNavigator: true)
+                  .pushNamed(_menumaster[id].direction);
               //Navigator.pushNamed(context,_menumaster[id].direction);
             },
             child: Padding(

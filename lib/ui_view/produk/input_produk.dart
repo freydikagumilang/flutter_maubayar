@@ -20,32 +20,35 @@ class InputProduk extends StatefulWidget {
 }
 
 class _InputProdukState extends State<InputProduk> {
-  List<kategori> kat = [kategori("pilih kategori",0.0)];
+  List<kategori> kat = [kategori("pilih kategori", 0.0)];
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<Createproduk>(create: (context) => Createproduk("")),
-        BlocProvider<GetKategori>(create: (context) => GetKategori(kat)),
-      ],
-      child: Scaffold(
-        backgroundColor: FitnessAppTheme.tosca,
-        appBar: FrxAppBar((widget.edit_prod != null)
-            ? "Edit Produk / Layanan"
-            : "Input Produk / Layanan"),
-        body: Container(
-            height: MediaQuery.of(context).size.height / 2,
-            padding: EdgeInsets.all(10),
-            child: InputForm(
-              edit_prod: widget.edit_prod,
-            )),
+    return WillPopScope(
+      onWillPop: () {
+        Navigator.of(context, rootNavigator: true).pushNamed("/produk");
+      },
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<Createproduk>(create: (context) => Createproduk("")),
+          BlocProvider<GetKategori>(create: (context) => GetKategori(kat)),
+        ],
+        child: Scaffold(
+          backgroundColor: FitnessAppTheme.tosca,
+          appBar: FrxAppBar(((widget.edit_prod != null)
+              ? "Edit Produk / Layanan"
+              : "Input Produk / Layanan"),backroute: "/produk",),
+          body: Container(
+              height: MediaQuery.of(context).size.height / 2,
+              padding: EdgeInsets.all(10),
+              child: InputForm(
+                edit_prod: widget.edit_prod,
+              )),
+        ),
       ),
     );
   }
 }
-
-
 
 class InputForm extends StatefulWidget {
   final produk edit_prod;
@@ -69,15 +72,14 @@ class _InputFormState extends State<InputForm> {
       bloc.add("");
       if (widget.edit_prod != null) {
         txtNamaProduk.text = widget.edit_prod.prod_nama;
-        txtHarga.text = f.format(widget.edit_prod.prod_price) ;
+        txtHarga.text = f.format(widget.edit_prod.prod_price);
         selectedkat = widget.edit_prod.prod_kat_id;
       }
     });
     setState(() {
       if (widget.edit_prod != null) {
-        isStock = (widget.edit_prod.prod_countable == 1) ? true : false; 
+        isStock = (widget.edit_prod.prod_countable == 1) ? true : false;
       }
-      
     });
   }
 

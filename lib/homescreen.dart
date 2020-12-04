@@ -6,6 +6,8 @@ import 'bottom_navigation_view/bottom_bar_view.dart';
 import 'fintness_app_theme.dart';
 
 class HomeScreen extends StatefulWidget {
+  final int tab_id;
+  HomeScreen({this.tab_id=0});
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -27,11 +29,16 @@ class _HomeScreenState extends State<HomeScreen>with TickerProviderStateMixin {
      tabIconsList.forEach((TabIconData tab) {
       tab.isSelected = false;
     });
-    tabIconsList[0].isSelected = true;
+    tabIconsList[widget.tab_id].isSelected = true;
 
     animationController = AnimationController(
     duration: const Duration(milliseconds: 600), vsync: this);
-    tabBody = Dashboard();
+    if(widget.tab_id==0){
+      tabBody = Dashboard();
+    }else if(widget.tab_id==1){
+      tabBody = MasterData();
+    }
+    
 
     super.initState();
   }
@@ -44,24 +51,27 @@ class _HomeScreenState extends State<HomeScreen>with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: FitnessAppTheme.background,
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: FutureBuilder<bool>(
-          future: getData(),
-          builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-            if (!snapshot.hasData) {
-              return const SizedBox();
-            } else {
-              return Stack(
-                children: <Widget>[
-                  tabBody,
-                  bottomBar(),
-                ],
-              );
-            }
-          },
+    return WillPopScope(
+      onWillPop: ()async=>false,
+          child: Container(
+        color: FitnessAppTheme.background,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: FutureBuilder<bool>(
+            future: getData(),
+            builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+              if (!snapshot.hasData) {
+                return const SizedBox();
+              } else {
+                return Stack(
+                  children: <Widget>[
+                    tabBody,
+                    bottomBar(),
+                  ],
+                );
+              }
+            },
+          ),
         ),
       ),
     );

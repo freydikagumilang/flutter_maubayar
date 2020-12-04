@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:maubayar/dashboard/dashboard.dart';
 import 'package:maubayar/homescreen.dart';
+import 'package:maubayar/masterdata.dart';
 import 'package:maubayar/models/produkmodel.dart';
 import 'package:maubayar/ui_view/masterdata/kapster.dart';
 import 'package:maubayar/ui_view/masterdata/pelanggan.dart';
@@ -11,18 +13,26 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  final int tab_id;
+  MyApp({this.tab_id=0});
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      routes: <String,WidgetBuilder>{
-          '/kategori':(context)=> new Kategori(),//Kategori(),
-          '/produk':(context)=> new Produk(),//Produk(),
-          '/pelanggan':(context)=> new Pelanggan(),
-          '/kapster':(context)=> new Kapster(),
-        },
-      home: HomeScreen(),
+    return WillPopScope(
+      onWillPop: ()async=>false,
+          child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        routes: <String,WidgetBuilder>{
+            '/dashboard':(context)=> new MyApp(tab_id: 2),//Kategori(),
+            '/masterdata':(context)=> new MyApp(tab_id: 1,),//Kategori(),
+            '/kategori':(context)=> new Kategori(),//Kategori(),
+            '/produk':(context)=> new Produk(),//Produk(),
+            '/pelanggan':(context)=> new Pelanggan(),
+            '/kapster':(context)=> new Kapster(),
+          },
+        home: HomeScreen(tab_id: tab_id,),
+      ),
     );
   }
 }

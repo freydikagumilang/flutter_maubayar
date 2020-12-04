@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maubayar/bloc/blocpelanggan.dart';
 import 'package:maubayar/fintness_app_theme.dart';
+import 'package:maubayar/main.dart';
 import 'package:maubayar/models/pelangganmodel.dart';
 import 'package:maubayar/ui_view/masterdata/input_pelanggan.dart';
 import 'package:maubayar/ui_view/template/frxappbar.dart';
@@ -15,28 +16,36 @@ class _PelangganState extends State<Pelanggan> {
   List<pelanggan> listplg;
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<Getpelanggan>(create: (context) => Getpelanggan(listplg)),
-        BlocProvider<Deletepelanggan>(create: (context) => Deletepelanggan(0)),
-      ],
-      child: Scaffold(
-        backgroundColor: FitnessAppTheme.tosca,
-        appBar: FrxAppBar("Pelanggan"),
-        floatingActionButton: FloatingActionButton(
-          child: Icon(
-            Icons.add,
-            size: 30,
-            color: FitnessAppTheme.darkText,
+    return WillPopScope(
+      onWillPop: () {
+        Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => MyApp(tab_id: 1,)));
+      },
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<Getpelanggan>(
+              create: (context) => Getpelanggan(listplg)),
+          BlocProvider<Deletepelanggan>(
+              create: (context) => Deletepelanggan(0)),
+        ],
+        child: Scaffold(
+          backgroundColor: FitnessAppTheme.tosca,
+          appBar: FrxAppBar("Pelanggan", backroute: "/masterdata"),
+          floatingActionButton: FloatingActionButton(
+            child: Icon(
+              Icons.add,
+              size: 30,
+              color: FitnessAppTheme.darkText,
+            ),
+            backgroundColor: FitnessAppTheme.yellow,
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => InputPelanggan()));
+            },
           ),
-          backgroundColor: FitnessAppTheme.yellow,
-          onPressed: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => InputPelanggan()));
-          },
+          body: Padding(
+              padding: const EdgeInsets.all(5.0), child: Pelangganlist()),
         ),
-        body:
-            Padding(padding: const EdgeInsets.all(5.0), child: Pelangganlist()),
       ),
     );
   }
@@ -127,13 +136,12 @@ class _PelangganlistState extends State<Pelangganlist> {
                                       child: GestureDetector(
                                         onTap: () {
                                           Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    InputPelanggan(
-                                                      editPlg:
-                                                          dataplg[index],
-                                                    )));
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      InputPelanggan(
+                                                        editPlg: dataplg[index],
+                                                      )));
                                         },
                                         child: Column(
                                           mainAxisAlignment:
@@ -178,11 +186,38 @@ class _PelangganlistState extends State<Pelangganlist> {
                                               .toString(),
                                           style: TextStyle(fontSize: 23)),
                                     ),
-                                    DataCell(Icon(
-                                      Icons.delete_forever,
-                                      size: 30,
-                                      color: FitnessAppTheme.redtext,
-                                    )),
+                                    DataCell(
+                                      GestureDetector(
+                                        onTap: () async {
+                                          AlertDialog delKat = AlertDialog(
+                                            title: Text(
+                                                "Hapus Kategori ${dataplg[index].pelanggan_nama}"),
+                                            content:
+                                                DeleteConfrimationPelanggan(
+                                                    dataplg[index]),
+                                          );
+                                          final del = await showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return BlocProvider<
+                                                    Deletepelanggan>.value(
+                                                  value: Deletepelanggan(0),
+                                                  child: delKat,
+                                                );
+                                              });
+                                          if (del) {
+                                            Getpelanggan bloc =
+                                                BlocProvider.of<Getpelanggan>(
+                                                    context);
+                                            bloc.add("");
+                                          }
+                                        },
+                                        child: Icon(
+                                          Icons.delete,
+                                          color: FitnessAppTheme.redtext,
+                                        ),
+                                      ),
+                                    ),
                                   ]),
                             ),
                           )),
@@ -192,6 +227,67 @@ class _PelangganlistState extends State<Pelangganlist> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class DeleteConfrimationPelanggan extends StatefulWidget {
+  final pelanggan delPlg;
+  DeleteConfrimationPelanggan(this.delPlg);
+  @override
+  _DeleteConfrimationPelangganState createState() =>
+      _DeleteConfrimationPelangganState();
+}
+
+class _DeleteConfrimationPelangganState
+    extends State<DeleteConfrimationPelanggan> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+              "Anda yakin ingin menghapus Pelanggan : \n${widget.delPlg.pelanggan_nama} ?"),
+          Padding(
+            padding: EdgeInsets.all(10),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              FlatButton(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  color: FitnessAppTheme.tosca,
+                  child: Text(
+                    "Tidak",
+                    style:
+                        TextStyle(fontSize: 18.0, color: FitnessAppTheme.white),
+                  )),
+              FlatButton(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                  color: FitnessAppTheme.redtext,
+                  onPressed: () {
+                    Deletepelanggan remover =
+                        BlocProvider.of<Deletepelanggan>(context);
+                    remover.add(widget.delPlg.pelanggan_id);
+                    Navigator.of(context).pop(true);
+                  },
+                  child: Text(
+                    "Ya, Hapus",
+                    style:
+                        TextStyle(fontSize: 18.0, color: FitnessAppTheme.white),
+                  )),
+            ],
+          )
+        ],
+      ),
     );
   }
 }

@@ -18,30 +18,32 @@ class _ProdukState extends State<Produk> {
 
   @override
   Widget build(BuildContext context) {
-    
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<Getproduk>(create: (context) => Getproduk(listprod)),
-        BlocProvider<Deleteproduk>(create: (context) => Deleteproduk(0)),
-      ],
-      child: Scaffold(
-        backgroundColor: FitnessAppTheme.tosca,
-        appBar: FrxAppBar("Item/Layanan"),
-        floatingActionButton: FloatingActionButton(
-          child: Icon(
-            Icons.add,
-            size: 30,
-            color: FitnessAppTheme.darkText,
+    return WillPopScope(
+      onWillPop: () {
+        Navigator.of(context, rootNavigator: true).pushNamed("/masterdata");
+      },
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<Getproduk>(create: (context) => Getproduk(listprod)),
+          BlocProvider<Deleteproduk>(create: (context) => Deleteproduk(0)),
+        ],
+        child: Scaffold(
+          backgroundColor: FitnessAppTheme.tosca,
+          appBar: FrxAppBar("Item/Layanan",backroute:"/masterdata",),
+          floatingActionButton: FloatingActionButton(
+            child: Icon(
+              Icons.add,
+              size: 30,
+              color: FitnessAppTheme.darkText,
+            ),
+            backgroundColor: FitnessAppTheme.yellow,
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => InputProduk()));
+            },
           ),
-          backgroundColor: FitnessAppTheme.yellow,
-          onPressed: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => InputProduk()));
-          },
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(5.0),
-          child: Produklist()
+          body:
+              Padding(padding: const EdgeInsets.all(5.0), child: Produklist()),
         ),
       ),
     );

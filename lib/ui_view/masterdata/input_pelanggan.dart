@@ -16,20 +16,26 @@ class InputPelanggan extends StatefulWidget {
 class InputPelangganState extends State<InputPelanggan> {
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<Createpelanggan>(
-        create: (BuildContext context) => Createpelanggan(""),
-        child: Scaffold(
-          backgroundColor: FitnessAppTheme.tosca,
-          appBar: FrxAppBar((widget.editPlg != null)
-              ? "Edit Pelanggan"
-              : "Input Pelanggan"),
-          body: Container(
-              height: MediaQuery.of(context).size.height / 2,
-              padding: EdgeInsets.all(10),
-              child: InputFormPelanggan(
-                editplg: widget.editPlg,
-              )),
-        ));
+    return WillPopScope(
+      onWillPop: () {
+        Navigator.of(context, rootNavigator: true).pushNamed("/pelanggan");
+      },
+      child: BlocProvider<Createpelanggan>(
+          create: (BuildContext context) => Createpelanggan(""),
+          child: Scaffold(
+            backgroundColor: FitnessAppTheme.tosca,
+            appBar: FrxAppBar(
+              ((widget.editPlg != null) ? "Edit Pelanggan" : "Input Pelanggan"),
+              backroute: "/pelanggan",
+            ),
+            body: Container(
+                height: MediaQuery.of(context).size.height / 2,
+                padding: EdgeInsets.all(10),
+                child: InputFormPelanggan(
+                  editplg: widget.editPlg,
+                )),
+          )),
+    );
   }
 }
 
@@ -48,9 +54,11 @@ class _InputFormPelangganState extends State<InputFormPelanggan> {
   @override
   void initState() {
     // TODO: implement initState
-    txtNamaPlg.text = widget.editplg.pelanggan_nama;
-    txtHP.text = widget.editplg.pelanggan_hp;
-    txtAlamat.text = widget.editplg.pelanggan_alamat;
+    if (widget.editplg != null) {
+      txtNamaPlg.text = widget.editplg.pelanggan_nama;
+      txtHP.text = widget.editplg.pelanggan_hp;
+      txtAlamat.text = widget.editplg.pelanggan_alamat;
+    }
   }
 
   @override

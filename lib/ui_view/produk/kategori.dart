@@ -17,54 +17,59 @@ class _KategoriState extends State<Kategori> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<GetKategori>(create: (context) => GetKategori(kat)),
-        BlocProvider<CreateKategori>(create: (context) => CreateKategori(0)),
-        BlocProvider<DeleteKategori>(create: (context) => DeleteKategori(0)),
-      ],
-      child: Scaffold(
-        backgroundColor: FitnessAppTheme.tosca,
-        appBar: FrxAppBar("Kategori"),
-        floatingActionButton: FloatingActionButton(
-          child: Icon(
-            Icons.add,
-            size: 30,
-            color: FitnessAppTheme.darkText,
+    return WillPopScope(
+      onWillPop: () {
+        Navigator.of(context, rootNavigator: true).pushNamed("/masterdata");
+      },
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<GetKategori>(create: (context) => GetKategori(kat)),
+          BlocProvider<CreateKategori>(create: (context) => CreateKategori(0)),
+          BlocProvider<DeleteKategori>(create: (context) => DeleteKategori(0)),
+        ],
+        child: Scaffold(
+          backgroundColor: FitnessAppTheme.tosca,
+          appBar: FrxAppBar("Kategori"),
+          floatingActionButton: FloatingActionButton(
+            child: Icon(
+              Icons.add,
+              size: 30,
+              color: FitnessAppTheme.darkText,
+            ),
+            backgroundColor: FitnessAppTheme.yellow,
+            onPressed: () async {
+              AlertDialog inputdialog = AlertDialog(
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Input Kategori"),
+                    GestureDetector(
+                      child: Icon(Icons.close),
+                      onTap: () {
+                        Navigator.pop(context, false);
+                      },
+                    ),
+                  ],
+                ),
+                content: InputKategori(),
+              );
+              final res = await showDialog(
+                  barrierDismissible: false,
+                  context: context,
+                  builder: (BuildContext context) {
+                    return BlocProvider<CreateKategori>.value(
+                      value: CreateKategori(0),
+                      child: inputdialog,
+                    );
+                  });
+              if (res) {
+                Navigator.pushReplacement(
+                    context, MaterialPageRoute(builder: (_) => Kategori()));
+              }
+            },
           ),
-          backgroundColor: FitnessAppTheme.yellow,
-          onPressed: () async {
-            AlertDialog inputdialog = AlertDialog(
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Input Kategori"),
-                  GestureDetector(
-                    child: Icon(Icons.close),
-                    onTap: () {
-                      Navigator.pop(context, false);
-                    },
-                  ),
-                ],
-              ),
-              content: InputKategori(),
-            );
-            final res = await showDialog(
-                barrierDismissible: false,
-                context: context,
-                builder: (BuildContext context) {
-                  return BlocProvider<CreateKategori>.value(
-                    value: CreateKategori(0),
-                    child: inputdialog,
-                  );
-                });
-            if (res) {
-              Navigator.pushReplacement(
-                  context, MaterialPageRoute(builder: (_) => Kategori()));
-            }
-          },
+          body: Padding(padding: EdgeInsets.all(5), child: kategorilist()),
         ),
-        body: Padding(padding: EdgeInsets.all(5), child: kategorilist()),
       ),
     );
   }
@@ -80,7 +85,7 @@ class kategorilist extends StatefulWidget {
 
 // ignore: camel_case_types
 class _kategorilistState extends State<kategorilist> {
-  var NumFormat = NumberFormat("#,###", "id"); 
+  var NumFormat = NumberFormat("#,###", "id");
   @override
   void initState() {
     // TODO: implement initState
@@ -180,11 +185,12 @@ class _kategorilistState extends State<kategorilist> {
                                                       editKat:
                                                           kat[index].kat_nama,
                                                       idKat: kat[index].kat_id,
-                                                      editKom: kat[index].kat_komisi,
+                                                      editKom:
+                                                          kat[index].kat_komisi,
                                                     ),
                                                   );
                                                   final res = await showDialog(
-                                                    barrierDismissible: false,
+                                                      barrierDismissible: false,
                                                       context: context,
                                                       builder: (BuildContext
                                                           context) {
@@ -210,7 +216,10 @@ class _kategorilistState extends State<kategorilist> {
                                               Text(
                                                 kat[index].kat_nama +
                                                     " - " +
-                                                    NumFormat.format(kat[index].kat_komisi).toString()+"%",
+                                                    NumFormat.format(kat[index]
+                                                            .kat_komisi)
+                                                        .toString() +
+                                                    "%",
                                                 style: TextStyle(fontSize: 21),
                                               ),
                                             ],
