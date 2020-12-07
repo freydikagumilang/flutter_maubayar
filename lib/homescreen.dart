@@ -88,7 +88,10 @@ class _HomeScreenState extends State<HomeScreen>with TickerProviderStateMixin {
         ),
         BottomBarView(
           tabIconsList: tabIconsList,
-          addClick: () {},
+          addClick: () {
+            Navigator.of(context, rootNavigator: true)
+                  .pushNamed("/kasir");
+          },
           changeIndex: (int index) {
             if (index == 0) {
               animationController.reverse().then<dynamic>((data) {

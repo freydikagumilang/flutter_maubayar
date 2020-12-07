@@ -7,6 +7,7 @@ import 'package:maubayar/ui_view/masterdata/kapster.dart';
 import 'package:maubayar/ui_view/masterdata/pelanggan.dart';
 import 'package:maubayar/ui_view/produk/produk.dart';
 import 'package:maubayar/ui_view/produk/kategori.dart';
+import 'package:maubayar/ui_view/transaksi/kasir.dart';
 
 void main() {
   runApp(MyApp());
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
             '/produk':(context)=> new Produk(),//Produk(),
             '/pelanggan':(context)=> new Pelanggan(),
             '/kapster':(context)=> new Kapster(),
+            '/kasir':(context)=> new Kasir(),
           },
         home: HomeScreen(tab_id: tab_id,),
       ),
