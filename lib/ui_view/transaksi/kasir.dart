@@ -12,6 +12,7 @@ import 'package:maubayar/models/pelangganmodel.dart';
 import 'package:maubayar/models/produkmodel.dart';
 import 'package:maubayar/ui_view/template/frxappbar.dart';
 import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart';
 
 class Kasir extends StatefulWidget {
   @override
@@ -34,6 +35,10 @@ class KasirState extends State<Kasir> with SingleTickerProviderStateMixin {
   void initState() {
     // TODO: implement initState
     tabct = new TabController(vsync: this, length: 3);
+    if (global_var.inv_temp_id == "") {
+      var uuid = Uuid();
+      global_var.inv_temp_id = uuid.v1();
+    }
   }
 
   @override
@@ -62,7 +67,7 @@ class KasirState extends State<Kasir> with SingleTickerProviderStateMixin {
         child: Scaffold(
           appBar: FrxAppBar("Kasir", backroute: "/masterdata"),
           body: TabBarView(controller: tabct, children: [
-            SearchItem(),
+            SearchItem(_movetabto),
             SearchPelanggan(_movetabto),
             KasirCheckout(_movetabto),
           ]),
@@ -107,19 +112,9 @@ class KasirState extends State<Kasir> with SingleTickerProviderStateMixin {
   }
 }
 
-class TabBarKasir extends StatefulWidget {
-  @override
-  _TabBarKasirState createState() => _TabBarKasirState();
-}
-
-class _TabBarKasirState extends State<TabBarKasir> {
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}
-
 class SearchItem extends StatefulWidget {
+  final ValueChanged<int> tabnavigator;
+  const SearchItem(this.tabnavigator);
   @override
   _SearchItemState createState() => _SearchItemState();
 }
@@ -204,7 +199,8 @@ class _SearchItemState extends State<SearchItem> {
                             onTap: () {
                               AlertDialog pilKapster = AlertDialog(
                                 title: Text("Beuatycian"),
-                                content: PilihKapster(),
+                                content: PilihKapster(
+                                    widget.tabnavigator, dt_item[idx]),
                               );
                               showDialog(
                                   context: context,
@@ -401,6 +397,7 @@ class _KasirCheckoutState extends State<KasirCheckout> {
                 },
                 children: [
                   TableRow(
+                      //table header
                       decoration: BoxDecoration(
                           border: Border(
                               bottom: BorderSide(
@@ -431,48 +428,54 @@ class _KasirCheckoutState extends State<KasirCheckout> {
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600))),
                       ]),
-                  TableRow(children: [
-                    Padding(
-                        padding: EdgeInsets.all(2.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Eyelash Natural",
-                                style: TextStyle(fontSize: 18)),
-                            Text("* Ukuran 12",
-                                style: TextStyle(
-                                    fontSize: 16, color: FitnessAppTheme.grey))
-                          ],
-                        )),
-                    Padding(
-                      padding: EdgeInsets.all(2.0),
-                      child: Text("1",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 18)),
-                    ),
-                    Padding(
-                        padding: EdgeInsets.all(2.0),
-                        child: Text(NumFormat.format(100000),
-                            textAlign: TextAlign.right,
-                            style: TextStyle(fontSize: 18))),
-                  ]),
-                  TableRow(children: [
-                    Padding(
-                        padding: EdgeInsets.all(2.0),
-                        child: Text("Eyelash Volume",
-                            style: TextStyle(fontSize: 18))),
-                    Padding(
-                      padding: const EdgeInsets.all(2.0),
-                      child: Text("1",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 18)),
-                    ),
-                    Padding(
-                        padding: EdgeInsets.all(2.0),
-                        child: Text(NumFormat.format(150000),
-                            textAlign: TextAlign.right,
-                            style: TextStyle(fontSize: 18))),
-                  ]),
+                  if (global_var.detailkasir != null)
+                    for (int idx = 0; idx < global_var.detailkasir.length; idx++)
+                      TableRow(children: [
+                        Padding(
+                            padding: EdgeInsets.all(2.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    GestureDetector(
+                                        child: Icon(
+                                      Icons.close,
+                                      size: 16,
+                                      color: FitnessAppTheme.redtext,
+                                    ),
+                                    onTap: ()async{
+                                      await global_var.detailkasir.removeAt(idx);
+                                      setState(() {});
+                                    },),
+                                    Text(global_var.detailkasir[idx].invdet_prod_nama,
+                                        style: TextStyle(fontSize: 18)),
+                                  ],
+                                ),
+                                Text("Btc : "+(global_var.detailkasir[idx].invdet_kapster_name ?? "-"),
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color: FitnessAppTheme.grey)),
+                                Text(global_var.detailkasir[idx].invdet_ket,
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color: FitnessAppTheme.grey))
+                              ],
+                            )),
+                        Padding(
+                          padding: EdgeInsets.all(2.0),
+                          child: Text(
+                              NumFormat.format(global_var.detailkasir[idx].invdet_qty).toString(),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 18)),
+                        ),
+                        Padding(
+                            padding: EdgeInsets.all(2.0),
+                            child: Text(NumFormat.format(global_var.detailkasir[idx].invdet_total),
+                                textAlign: TextAlign.right,
+                                style: TextStyle(fontSize: 18))),
+                      ]),
                   TableRow(
                       decoration: BoxDecoration(
                           border: Border(
@@ -490,7 +493,10 @@ class _KasirCheckoutState extends State<KasirCheckout> {
                                     fontWeight: FontWeight.w400))),
                         Padding(
                           padding: const EdgeInsets.all(2.0),
-                          child: Text("2",
+                          child: Text(
+                              (global_var.detailkasir == null)
+                                  ? "0"
+                                  : global_var.detailkasir.length.toString(),
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.w400)),
@@ -584,10 +590,13 @@ class _KasirCheckoutState extends State<KasirCheckout> {
                                 size: 18,
                                 color: FitnessAppTheme.tosca,
                               ),
-                              Text(NumFormat.format((global_var.pembayaran ?? 0)),
+                              Text(
+                                  NumFormat.format(
+                                      (global_var.pembayaran ?? 0)),
                                   textAlign: TextAlign.right,
                                   style: TextStyle(
-                                      fontSize: 18, fontWeight: FontWeight.w400)),
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w400)),
                             ],
                           ),
                           onTap: () async {
@@ -620,12 +629,16 @@ class _KasirCheckoutState extends State<KasirCheckout> {
 }
 
 class PilihKapster extends StatefulWidget {
+  final ValueChanged<int> tabnavigator;
+  final produk add_prod;
+  const PilihKapster(this.tabnavigator, this.add_prod);
   @override
   _PilihKapsterState createState() => _PilihKapsterState();
 }
 
 class _PilihKapsterState extends State<PilihKapster> {
   int selectedkapster;
+  kapster detkapster;
   TextEditingController txtketItem = TextEditingController();
   @override
   void initState() {
@@ -675,6 +688,8 @@ class _PilihKapsterState extends State<PilihKapster> {
                 onChanged: (selItem) {
                   setState(() {
                     selectedkapster = selItem;
+                    detkapster = snapshot[snapshot.indexWhere((dt) => dt.kapster_id==selItem)];
+                    print(detkapster.kapster_nama);
                   });
                 }),
             Text(
@@ -694,12 +709,36 @@ class _PilihKapsterState extends State<PilihKapster> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5.0),
                 ),
-                onPressed: () {
-                  Navigator.of(context).pop(false);
+                onPressed: () async {
+                  //add to list
+                  produk _prod = widget.add_prod;
+                  int _date = DateTime.now().microsecondsSinceEpoch;
+                  print(detkapster.kapster_nama);
+                  invoicedet insert_det = await invoicedet(
+                      global_var.inv_temp_id,
+                      _prod.prod_id,
+                      txtketItem.text.toString(),
+                      1,
+                      _prod.prod_price,
+                      _prod.prod_price,
+                      _prod.komisi_kat / 100 * _prod.prod_price,
+                      selectedkapster,
+                      _date,
+                      0,
+                      0,
+                      invdet_prod_nama: _prod.prod_nama,
+                      invdet_kapster_name: detkapster.kapster_nama);
+                  if (global_var.detailkasir == null) {
+                    global_var.detailkasir = [insert_det];
+                  } else {
+                    global_var.detailkasir.add(insert_det);
+                  }
+                  Navigator.of(context).pop(true);
+                  widget.tabnavigator(2);
                 },
                 color: FitnessAppTheme.tosca,
                 child: Text(
-                  "Pilih",
+                  "Tambah Ke List",
                   style:
                       TextStyle(fontSize: 18.0, color: FitnessAppTheme.white),
                 ))

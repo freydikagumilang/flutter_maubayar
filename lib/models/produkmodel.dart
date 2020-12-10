@@ -12,6 +12,7 @@ class produk {
   double _prod_cogs;
   int _prod_suspended;
   String kat_nama;
+  double komisi_kat;
 
   produk(
     this._prod_nama,
@@ -23,7 +24,7 @@ class produk {
     this._prod_price,
     this._prod_cogs,
     this._prod_suspended,
-    {this.kat_nama}
+    {this.kat_nama,this.komisi_kat}
   );
   produk.map(dynamic obj) {
     this._prod_nama = obj["prod_nama"];
@@ -107,7 +108,8 @@ class produkDAO {
         datalist[i]['prod_price'],
         datalist[i]['prod_cogs'],
         datalist[i]['prod_suspended'],
-        kat_nama: datalist[i]['kat_nama']
+        kat_nama: datalist[i]['kat_nama'],
+        komisi_kat:datalist[i]['kat_komisi']
       );
       listproduk.add(row);
       row.setId(datalist[i]["prod_id"]);
