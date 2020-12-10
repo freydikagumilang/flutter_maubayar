@@ -7,6 +7,7 @@ import 'package:maubayar/fintness_app_theme.dart';
 import 'package:maubayar/global_var.dart';
 import 'package:maubayar/main.dart';
 import 'package:maubayar/models/kapstermodel.dart';
+import 'package:maubayar/models/kasirmodel.dart';
 import 'package:maubayar/models/pelangganmodel.dart';
 import 'package:maubayar/models/produkmodel.dart';
 import 'package:maubayar/ui_view/template/frxappbar.dart';
@@ -67,21 +68,38 @@ class KasirState extends State<Kasir> with SingleTickerProviderStateMixin {
           ]),
           bottomNavigationBar: new Material(
               color: FitnessAppTheme.tosca,
-              child: TabBar(
-                controller: tabct,
-                indicatorColor: FitnessAppTheme.yellow,
-                indicatorWeight: 3,
-                tabs: [
-                  Tab(icon: Icon(Icons.search), text: "Item"),
-                  Tab(
-                    icon: Icon(Icons.person),
-                    text: "Pelanggan",
+              child: Container(
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3), // changes position of shadow
+                    )
+                  ],
+                  color: FitnessAppTheme.tosca,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
                   ),
-                  Tab(
-                    icon: Icon(Icons.payment_rounded),
-                    text: "Bayar",
-                  ),
-                ],
+                ),
+                child: TabBar(
+                  controller: tabct,
+                  indicatorColor: FitnessAppTheme.yellow,
+                  indicatorWeight: 3,
+                  tabs: [
+                    Tab(icon: Icon(Icons.search), text: "Item"),
+                    Tab(
+                      icon: Icon(Icons.person),
+                      text: "Pelanggan",
+                    ),
+                    Tab(
+                      icon: Icon(Icons.payment_rounded),
+                      text: "Bayar",
+                    ),
+                  ],
+                ),
               )),
         ),
       ),
@@ -313,7 +331,7 @@ class KasirCheckout extends StatefulWidget {
 }
 
 class _KasirCheckoutState extends State<KasirCheckout> {
-  var NumFormat = new NumberFormat.compact(locale: "id");
+  var NumFormat = new NumberFormat.compact(locale: "en");
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -406,7 +424,7 @@ class _KasirCheckoutState extends State<KasirCheckout> {
                                   fontSize: 18, fontWeight: FontWeight.w600)),
                         ),
                         Padding(
-                            padding:  EdgeInsets.all(2.0),
+                            padding: EdgeInsets.all(2.0),
                             child: Text("Nominal",
                                 textAlign: TextAlign.right,
                                 style: TextStyle(
@@ -415,7 +433,7 @@ class _KasirCheckoutState extends State<KasirCheckout> {
                       ]),
                   TableRow(children: [
                     Padding(
-                        padding:  EdgeInsets.all(2.0),
+                        padding: EdgeInsets.all(2.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -427,20 +445,20 @@ class _KasirCheckoutState extends State<KasirCheckout> {
                           ],
                         )),
                     Padding(
-                      padding:  EdgeInsets.all(2.0),
+                      padding: EdgeInsets.all(2.0),
                       child: Text("1",
                           textAlign: TextAlign.center,
                           style: TextStyle(fontSize: 18)),
                     ),
                     Padding(
-                        padding:  EdgeInsets.all(2.0),
+                        padding: EdgeInsets.all(2.0),
                         child: Text(NumFormat.format(100000),
                             textAlign: TextAlign.right,
                             style: TextStyle(fontSize: 18))),
                   ]),
                   TableRow(children: [
                     Padding(
-                        padding:  EdgeInsets.all(2.0),
+                        padding: EdgeInsets.all(2.0),
                         child: Text("Eyelash Volume",
                             style: TextStyle(fontSize: 18))),
                     Padding(
@@ -450,7 +468,7 @@ class _KasirCheckoutState extends State<KasirCheckout> {
                           style: TextStyle(fontSize: 18)),
                     ),
                     Padding(
-                        padding:  EdgeInsets.all(2.0),
+                        padding: EdgeInsets.all(2.0),
                         child: Text(NumFormat.format(150000),
                             textAlign: TextAlign.right,
                             style: TextStyle(fontSize: 18))),
@@ -464,7 +482,7 @@ class _KasirCheckoutState extends State<KasirCheckout> {
                       ))),
                       children: [
                         Padding(
-                            padding:  EdgeInsets.all(2.0),
+                            padding: EdgeInsets.all(2.0),
                             child: Text("Total",
                                 textAlign: TextAlign.right,
                                 style: TextStyle(
@@ -478,7 +496,7 @@ class _KasirCheckoutState extends State<KasirCheckout> {
                                   fontSize: 18, fontWeight: FontWeight.w400)),
                         ),
                         Padding(
-                            padding:  EdgeInsets.all(2.0),
+                            padding: EdgeInsets.all(2.0),
                             child: Text(NumFormat.format(250000),
                                 textAlign: TextAlign.right,
                                 style: TextStyle(
@@ -487,7 +505,7 @@ class _KasirCheckoutState extends State<KasirCheckout> {
                       ]),
                   TableRow(children: [
                     Padding(
-                        padding:  EdgeInsets.all(2.0),
+                        padding: EdgeInsets.all(2.0),
                         child: Text("Potongan",
                             textAlign: TextAlign.right,
                             style: TextStyle(
@@ -504,15 +522,46 @@ class _KasirCheckoutState extends State<KasirCheckout> {
                       ],
                     ),
                     Padding(
-                        padding:  EdgeInsets.all(2.0),
-                        child: Text(NumFormat.format(10000),
-                            textAlign: TextAlign.right,
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.w400))),
+                        padding: EdgeInsets.all(2.0),
+                        child: GestureDetector(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Icon(
+                                Icons.edit,
+                                size: 18,
+                                color: FitnessAppTheme.tosca,
+                              ),
+                              Text(NumFormat.format((global_var.diskon ?? 0)),
+                                  textAlign: TextAlign.right,
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w400)),
+                            ],
+                          ),
+                          onTap: () async {
+                            AlertDialog inputPot = AlertDialog(
+                              title: Text("Potongan"),
+                              content: InputPotongan(),
+                            );
+                            var setpot = await showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return inputPot;
+                                });
+
+                            if (setpot) {
+                              setState(() {
+                                print(global_var.diskon);
+                              });
+                            }
+                          },
+                        )),
                   ]),
                   TableRow(children: [
                     Padding(
-                        padding:  EdgeInsets.all(2.0),
+                        padding: EdgeInsets.all(2.0),
                         child: Text("Bayar",
                             textAlign: TextAlign.right,
                             style: TextStyle(
@@ -526,10 +575,39 @@ class _KasirCheckoutState extends State<KasirCheckout> {
                     ),
                     Padding(
                         padding: EdgeInsets.all(2.0),
-                        child: Text(NumFormat.format(240000),
-                            textAlign: TextAlign.right,
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.w400))),
+                        child: GestureDetector(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Icon(
+                                Icons.edit,
+                                size: 18,
+                                color: FitnessAppTheme.tosca,
+                              ),
+                              Text(NumFormat.format((global_var.pembayaran ?? 0)),
+                                  textAlign: TextAlign.right,
+                                  style: TextStyle(
+                                      fontSize: 18, fontWeight: FontWeight.w400)),
+                            ],
+                          ),
+                          onTap: () async {
+                            AlertDialog inputBayar = AlertDialog(
+                              title: Text("Pembayaran"),
+                              content: InputBayar(),
+                            );
+                            var paid = await showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return inputBayar;
+                                });
+
+                            if (paid == true) {
+                              setState(() {
+                                print(global_var.pembayaran);
+                              });
+                            }
+                          },
+                        )),
                   ]),
                 ],
               )
@@ -627,6 +705,121 @@ class _PilihKapsterState extends State<PilihKapster> {
                 ))
           ],
         ),
+      ),
+    );
+  }
+}
+
+class InputPotongan extends StatefulWidget {
+  @override
+  _InputPotonganState createState() => _InputPotonganState();
+}
+
+class _InputPotonganState extends State<InputPotongan> {
+  TextEditingController txtPot = TextEditingController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    txtPot.text = (global_var.diskon ?? 0).toString();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height / 6,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          TextFormField(
+            controller: txtPot,
+            style: TextStyle(fontSize: 16.0, color: Colors.black),
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(hintText: "Pembayaran"),
+          ),
+          Padding(padding: EdgeInsets.all(5)),
+          FlatButton(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5.0),
+              ),
+              onPressed: () {
+                setState(() {
+                  global_var.diskon = double.parse(txtPot.text);
+                });
+
+                Navigator.of(context).pop(true);
+              },
+              color: FitnessAppTheme.tosca,
+              child: Text(
+                "Potongan",
+                style: TextStyle(fontSize: 18.0, color: FitnessAppTheme.white),
+              ))
+        ],
+      ),
+    );
+  }
+}
+
+class InputBayar extends StatefulWidget {
+  @override
+  _InputBayarState createState() => _InputBayarState();
+}
+
+class _InputBayarState extends State<InputBayar> {
+  TextEditingController txtbayar = TextEditingController();
+  bool isTunai = true;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height / 4,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                "Tunai",
+                style: TextStyle(fontSize: 18),
+              ),
+              Switch(
+                  activeColor: FitnessAppTheme.tosca,
+                  inactiveTrackColor: Colors.red[200],
+                  inactiveThumbColor: FitnessAppTheme.nearlyBlue,
+                  value: isTunai,
+                  onChanged: (newVal) {
+                    setState(() {
+                      isTunai = newVal;
+                    });
+                  }),
+            ],
+          ),
+          TextFormField(
+            controller: txtbayar,
+            style: TextStyle(fontSize: 16.0, color: Colors.black),
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(hintText: "Pembayaran"),
+          ),
+          Padding(padding: EdgeInsets.all(5)),
+          FlatButton(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5.0),
+              ),
+              onPressed: () {
+                setState(() {
+                  global_var.pembayaran = double.parse(txtbayar.text);
+                  global_var.isTunai = (isTunai) ? 1 : 0;
+                });
+                Navigator.of(context).pop(true);
+              },
+              color: FitnessAppTheme.tosca,
+              child: Text(
+                "Bayar",
+                style: TextStyle(fontSize: 18.0, color: FitnessAppTheme.white),
+              ))
+        ],
       ),
     );
   }
