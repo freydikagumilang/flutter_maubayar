@@ -6,6 +6,7 @@ class global_var {
   static double diskon=0;
   static double pembayaran=0;
   static double kembalian=0;
+  static double total=0;
   static int isTunai=0;
   static List<invoicedet> detailkasir;
   static String inv_temp_id = "";

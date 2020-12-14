@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maubayar/bloc/blockapster.dart';
+import 'package:maubayar/bloc/blockasir.dart';
 import 'package:maubayar/bloc/blocpelanggan.dart';
 import 'package:maubayar/bloc/blocproduk.dart';
 import 'package:maubayar/fintness_app_theme.dart';
@@ -10,6 +11,7 @@ import 'package:maubayar/models/kapstermodel.dart';
 import 'package:maubayar/models/kasirmodel.dart';
 import 'package:maubayar/models/pelangganmodel.dart';
 import 'package:maubayar/models/produkmodel.dart';
+import 'package:maubayar/txtformater.dart';
 import 'package:maubayar/ui_view/template/frxappbar.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
@@ -63,6 +65,7 @@ class KasirState extends State<Kasir> with SingleTickerProviderStateMixin {
           BlocProvider<Getkapster>(create: (context) => Getkapster(kaps)),
           BlocProvider<Getproduk>(create: (context) => Getproduk(prod)),
           BlocProvider<Getpelanggan>(create: (context) => Getpelanggan(plg)),
+          BlocProvider<InsertDet>(create: (context) => InsertDet(0.0)),
         ],
         child: Scaffold(
           appBar: FrxAppBar("Kasir", backroute: "/masterdata"),
@@ -207,7 +210,10 @@ class _SearchItemState extends State<SearchItem> {
                                   builder: (BuildContext context) {
                                     return BlocProvider<Getkapster>.value(
                                       value: Getkapster(kaps),
-                                      child: pilKapster,
+                                      child: BlocProvider<InsertDet>.value(
+                                        value: InsertDet(0.0),
+                                        child: pilKapster,
+                                      ),
                                     );
                                   });
                             },
@@ -333,296 +339,388 @@ class _KasirCheckoutState extends State<KasirCheckout> {
     return Container(
       padding: EdgeInsets.all(10),
       color: FitnessAppTheme.tosca,
-      child: Card(
-        elevation: 3,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text("Aloodie Beauty Studio",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-              Text("Tanjung Anom, Solobaru, Sukoharjo"),
-              Text("Wa: 08467324824974"),
-              Text("IG : @aloodie.beauty"),
-              Padding(padding: EdgeInsets.all(10)),
-              Row(
+      child: ListView(
+        children: [
+          Card(
+            elevation: 3,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Text("Aloodie Beauty Studio",
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                  Text("Tanjung Anom, Solobaru, Sukoharjo"),
+                  Text("Wa: 08467324824974"),
+                  Text("IG : @aloodie.beauty"),
+                  Padding(padding: EdgeInsets.all(10)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text(
-                        "No.Inv",
-                        style: TextStyle(fontSize: 16),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "No.Inv",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          Text("Tgl", style: TextStyle(fontSize: 16)),
+                          Text("Pelanggan", style: TextStyle(fontSize: 16)),
+                        ],
                       ),
-                      Text("Tgl", style: TextStyle(fontSize: 16)),
-                      Text("Pelanggan", style: TextStyle(fontSize: 16)),
+                      Padding(padding: EdgeInsets.all(10)),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("5480653458", style: TextStyle(fontSize: 16)),
+                          Text("01-Jan-2021", style: TextStyle(fontSize: 16)),
+                          GestureDetector(
+                              onTap: () {
+                                widget.tabnavigator(1);
+                              },
+                              child: Text(
+                                ((global_var.kasirpelanggan == null)
+                                    ? "Pilih Pelanggan"
+                                    : global_var.kasirpelanggan.pelanggan_nama),
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    color: FitnessAppTheme.nearlyBlue),
+                              )),
+                        ],
+                      ),
                     ],
                   ),
                   Padding(padding: EdgeInsets.all(10)),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Table(
+                    border: TableBorder(
+                      top: BorderSide(width: 1),
+                    ),
+                    columnWidths: {
+                      0: FractionColumnWidth(0.5),
+                      1: FractionColumnWidth(0.2),
+                      2: FractionColumnWidth(0.3)
+                    },
                     children: [
-                      Text("5480653458", style: TextStyle(fontSize: 16)),
-                      Text("01-Jan-2021", style: TextStyle(fontSize: 16)),
-                      GestureDetector(
-                          onTap: () {
-                            widget.tabnavigator(1);
-                          },
-                          child: Text(
-                            ((global_var.kasirpelanggan == null)
-                                ? "Pilih Pelanggan"
-                                : global_var.kasirpelanggan.pelanggan_nama),
-                            style: TextStyle(
-                                fontSize: 18,
-                                color: FitnessAppTheme.nearlyBlue),
-                          )),
-                    ],
-                  ),
-                ],
-              ),
-              Padding(padding: EdgeInsets.all(10)),
-              Table(
-                border: TableBorder(
-                  top: BorderSide(width: 1),
-                ),
-                columnWidths: {
-                  0: FractionColumnWidth(0.5),
-                  1: FractionColumnWidth(0.2),
-                  2: FractionColumnWidth(0.3)
-                },
-                children: [
-                  TableRow(
-                      //table header
-                      decoration: BoxDecoration(
-                          border: Border(
-                              bottom: BorderSide(
-                        //                   <--- left side
-                        color: Colors.black,
-                        width: 1.0,
-                      ))),
-                      children: [
-                        Padding(
-                            padding: EdgeInsets.all(2.0),
-                            child: Text(
-                              "Item",
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w600),
-                            )),
-                        Padding(
-                          padding: const EdgeInsets.all(2.0),
-                          child: Text("Qty",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w600)),
-                        ),
-                        Padding(
-                            padding: EdgeInsets.all(2.0),
-                            child: Text("Nominal",
-                                textAlign: TextAlign.right,
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600))),
-                      ]),
-                  if (global_var.detailkasir != null)
-                    for (int idx = 0; idx < global_var.detailkasir.length; idx++)
+                      TableRow(
+                          //table header
+                          decoration: BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(
+                            //                   <--- left side
+                            color: Colors.black,
+                            width: 1.0,
+                          ))),
+                          children: [
+                            Padding(
+                                padding: EdgeInsets.all(2.0),
+                                child: Text(
+                                  "Item",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600),
+                                )),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Text("Qty",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600)),
+                            ),
+                            Padding(
+                                padding: EdgeInsets.all(2.0),
+                                child: Text("Nominal",
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600))),
+                          ]),
+                      if (global_var.detailkasir != null)
+                        for (int idx = 0;
+                            idx < global_var.detailkasir.length;
+                            idx++)
+                          TableRow(children: [
+                            Padding(
+                                padding: EdgeInsets.all(2.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        GestureDetector(
+                                          child: Icon(
+                                            Icons.close,
+                                            size: 16,
+                                            color: FitnessAppTheme.redtext,
+                                          ),
+                                          onTap: () async {
+                                            global_var.total -= global_var
+                                                .detailkasir[idx].invdet_total;
+                                            await global_var.detailkasir
+                                                .removeAt(idx);
+                                            setState(() {
+                                              global_var.kembalian =
+                                                  global_var.pembayaran +
+                                                      global_var.diskon -
+                                                      global_var.total;
+                                            });
+                                          },
+                                        ),
+                                        Text(
+                                            global_var.detailkasir[idx]
+                                                .invdet_prod_nama,
+                                            style: TextStyle(fontSize: 22)),
+                                      ],
+                                    ),
+                                    Text(
+                                        "Btc : " +
+                                            (global_var.detailkasir[idx]
+                                                    .invdet_kapster_name ??
+                                                "-"),
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            color: FitnessAppTheme.grey)),
+                                    Text(global_var.detailkasir[idx].invdet_ket,
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            color: FitnessAppTheme.grey))
+                                  ],
+                                )),
+                            Padding(
+                              padding: EdgeInsets.all(2.0),
+                              child: Text(
+                                  NumFormat.format(global_var
+                                          .detailkasir[idx].invdet_qty)
+                                      .toString(),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 18)),
+                            ),
+                            Padding(
+                                padding: EdgeInsets.all(2.0),
+                                child: Text(
+                                    NumFormat.format(global_var
+                                        .detailkasir[idx].invdet_total),
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(fontSize: 18))),
+                          ]),
+                      TableRow(
+                          decoration: BoxDecoration(
+                              border: Border(
+                                  top: BorderSide(
+                            color: Colors.black,
+                            width: 1.0,
+                          ))),
+                          children: [
+                            Padding(
+                                padding: EdgeInsets.all(2.0),
+                                child: Text("Total",
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w400))),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Text(
+                                  (global_var.detailkasir == null)
+                                      ? "0"
+                                      : global_var.detailkasir.length
+                                          .toString(),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w400)),
+                            ),
+                            Padding(
+                                padding: EdgeInsets.all(2.0),
+                                child: Text(NumFormat.format(global_var.total),
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w400))),
+                          ]),
                       TableRow(children: [
                         Padding(
                             padding: EdgeInsets.all(2.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    GestureDetector(
-                                        child: Icon(
-                                      Icons.close,
-                                      size: 16,
-                                      color: FitnessAppTheme.redtext,
-                                    ),
-                                    onTap: ()async{
-                                      await global_var.detailkasir.removeAt(idx);
-                                      setState(() {});
-                                    },),
-                                    Text(global_var.detailkasir[idx].invdet_prod_nama,
-                                        style: TextStyle(fontSize: 18)),
-                                  ],
-                                ),
-                                Text("Btc : "+(global_var.detailkasir[idx].invdet_kapster_name ?? "-"),
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        color: FitnessAppTheme.grey)),
-                                Text(global_var.detailkasir[idx].invdet_ket,
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        color: FitnessAppTheme.grey))
-                              ],
+                            child: Text("Potongan",
+                                textAlign: TextAlign.right,
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w400))),
+                        Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Text("",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w400)),
+                            ),
+                          ],
+                        ),
+                        Padding(
+                            padding: EdgeInsets.all(2.0),
+                            child: GestureDetector(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Icon(
+                                    Icons.edit,
+                                    size: 22,
+                                    color: FitnessAppTheme.tosca,
+                                  ),
+                                  Text(
+                                      NumFormat.format(
+                                          (global_var.diskon ?? 0)),
+                                      textAlign: TextAlign.right,
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w400)),
+                                ],
+                              ),
+                              onTap: () async {
+                                AlertDialog inputPot = AlertDialog(
+                                  title: Text("Potongan"),
+                                  content: InputPotongan(),
+                                );
+                                var setpot = await showDialog(
+                                    barrierDismissible: false,
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return inputPot;
+                                    });
+
+                                if (setpot) {
+                                  setState(() {});
+                                }
+                              },
                             )),
-                        Padding(
-                          padding: EdgeInsets.all(2.0),
-                          child: Text(
-                              NumFormat.format(global_var.detailkasir[idx].invdet_qty).toString(),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 18)),
-                        ),
-                        Padding(
-                            padding: EdgeInsets.all(2.0),
-                            child: Text(NumFormat.format(global_var.detailkasir[idx].invdet_total),
-                                textAlign: TextAlign.right,
-                                style: TextStyle(fontSize: 18))),
                       ]),
-                  TableRow(
-                      decoration: BoxDecoration(
-                          border: Border(
-                              top: BorderSide(
-                        color: Colors.black,
-                        width: 1.0,
-                      ))),
-                      children: [
+                      TableRow(children: [
                         Padding(
                             padding: EdgeInsets.all(2.0),
-                            child: Text("Total",
+                            child: Text("Pembayaran",
                                 textAlign: TextAlign.right,
                                 style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 20,
                                     fontWeight: FontWeight.w400))),
-                        Padding(
-                          padding: const EdgeInsets.all(2.0),
-                          child: Text(
-                              (global_var.detailkasir == null)
-                                  ? "0"
-                                  : global_var.detailkasir.length.toString(),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w400)),
-                        ),
-                        Padding(
-                            padding: EdgeInsets.all(2.0),
-                            child: Text(NumFormat.format(250000),
-                                textAlign: TextAlign.right,
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w400))),
-                      ]),
-                  TableRow(children: [
-                    Padding(
-                        padding: EdgeInsets.all(2.0),
-                        child: Text("Potongan",
-                            textAlign: TextAlign.right,
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.w400))),
-                    Column(
-                      children: [
                         Padding(
                           padding: const EdgeInsets.all(2.0),
                           child: Text("",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w400)),
+                                  fontSize: 20, fontWeight: FontWeight.w400)),
                         ),
-                      ],
-                    ),
-                    Padding(
-                        padding: EdgeInsets.all(2.0),
-                        child: GestureDetector(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Icon(
-                                Icons.edit,
-                                size: 18,
-                                color: FitnessAppTheme.tosca,
+                        Padding(
+                            padding: EdgeInsets.all(2.0),
+                            child: GestureDetector(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Icon(
+                                    Icons.edit,
+                                    size: 22,
+                                    color: FitnessAppTheme.tosca,
+                                  ),
+                                  Text(
+                                      NumFormat.format(
+                                          (global_var.pembayaran ?? 0)),
+                                      textAlign: TextAlign.right,
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w400)),
+                                ],
                               ),
-                              Text(NumFormat.format((global_var.diskon ?? 0)),
-                                  textAlign: TextAlign.right,
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w400)),
-                            ],
-                          ),
-                          onTap: () async {
-                            AlertDialog inputPot = AlertDialog(
-                              title: Text("Potongan"),
-                              content: InputPotongan(),
-                            );
-                            var setpot = await showDialog(
-                                barrierDismissible: false,
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return inputPot;
-                                });
+                              onTap: () async {
+                                AlertDialog inputBayar = AlertDialog(
+                                  title: Text("Pembayaran"),
+                                  content: InputBayar(),
+                                );
+                                var paid = await showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return inputBayar;
+                                    });
 
-                            if (setpot) {
-                              setState(() {
-                                print(global_var.diskon);
-                              });
-                            }
-                          },
-                        )),
-                  ]),
-                  TableRow(children: [
-                    Padding(
-                        padding: EdgeInsets.all(2.0),
-                        child: Text("Bayar",
-                            textAlign: TextAlign.right,
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.w400))),
-                    Padding(
-                      padding: const EdgeInsets.all(2.0),
-                      child: Text("",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w400)),
-                    ),
-                    Padding(
-                        padding: EdgeInsets.all(2.0),
-                        child: GestureDetector(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Icon(
-                                Icons.edit,
-                                size: 18,
-                                color: FitnessAppTheme.tosca,
-                              ),
-                              Text(
-                                  NumFormat.format(
-                                      (global_var.pembayaran ?? 0)),
-                                  textAlign: TextAlign.right,
+                                if (paid == true) {
+                                  setState(() {});
+                                }
+                              },
+                            )),
+                      ]),
+                      TableRow(children: [
+                        Padding(
+                            padding: EdgeInsets.all(2.0),
+                            child: Text(
+                                (global_var.kembalian >= 0)
+                                    ? "Kembali"
+                                    : "Kurang",
+                                textAlign: TextAlign.right,
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w400,
+                                    color: (global_var.kembalian > 0)
+                                        ? Colors.black
+                                        : FitnessAppTheme.redtext))),
+                        Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Text("",
+                                  textAlign: TextAlign.center,
                                   style: TextStyle(
-                                      fontSize: 18,
+                                      fontSize: 20,
                                       fontWeight: FontWeight.w400)),
-                            ],
-                          ),
-                          onTap: () async {
-                            AlertDialog inputBayar = AlertDialog(
-                              title: Text("Pembayaran"),
-                              content: InputBayar(),
-                            );
-                            var paid = await showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return inputBayar;
-                                });
-
-                            if (paid == true) {
-                              setState(() {
-                                print(global_var.pembayaran);
-                              });
-                            }
-                          },
-                        )),
-                  ]),
+                            ),
+                          ],
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(2.0),
+                          child: Text(
+                              NumFormat.format((global_var.kembalian).abs()),
+                              textAlign: TextAlign.right,
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w400,
+                                  color: (global_var.kembalian >= 0)
+                                      ? Colors.black
+                                      : FitnessAppTheme.redtext)),
+                        ),
+                      ]),
+                    ],
+                  ),
                 ],
-              )
-            ],
+              ),
+            ),
           ),
-        ),
+          Padding(padding: EdgeInsets.all(8)),
+          RaisedButton(
+            elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30.0),
+              ),
+              onPressed: () {},
+              color: Colors.amber[600],
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Icon(Icons.save),
+                    Text(
+                      "Simpan Transaksi",
+                      style: TextStyle(fontSize: 25.0,),
+                    ),
+                  ],
+                ),
+              ))
+        ],
       ),
     );
   }
@@ -652,6 +750,7 @@ class _PilihKapsterState extends State<PilihKapster> {
 
   @override
   Widget build(BuildContext context) {
+    InsertDet _insertDet = BlocProvider.of<InsertDet>(context);
     return Container(
       height: MediaQuery.of(context).size.height / 3,
       child: BlocBuilder<Getkapster, List<kapster>>(
@@ -688,7 +787,8 @@ class _PilihKapsterState extends State<PilihKapster> {
                 onChanged: (selItem) {
                   setState(() {
                     selectedkapster = selItem;
-                    detkapster = snapshot[snapshot.indexWhere((dt) => dt.kapster_id==selItem)];
+                    detkapster = snapshot[
+                        snapshot.indexWhere((dt) => dt.kapster_id == selItem)];
                     print(detkapster.kapster_nama);
                   });
                 }),
@@ -713,8 +813,7 @@ class _PilihKapsterState extends State<PilihKapster> {
                   //add to list
                   produk _prod = widget.add_prod;
                   int _date = DateTime.now().microsecondsSinceEpoch;
-                  print(detkapster.kapster_nama);
-                  invoicedet insert_det = await invoicedet(
+                  invoicedet itemdet = await invoicedet(
                       global_var.inv_temp_id,
                       _prod.prod_id,
                       txtketItem.text.toString(),
@@ -728,11 +827,7 @@ class _PilihKapsterState extends State<PilihKapster> {
                       0,
                       invdet_prod_nama: _prod.prod_nama,
                       invdet_kapster_name: detkapster.kapster_nama);
-                  if (global_var.detailkasir == null) {
-                    global_var.detailkasir = [insert_det];
-                  } else {
-                    global_var.detailkasir.add(insert_det);
-                  }
+                  _insertDet.add(itemdet);
                   Navigator.of(context).pop(true);
                   widget.tabnavigator(2);
                 },
@@ -756,11 +851,12 @@ class InputPotongan extends StatefulWidget {
 
 class _InputPotonganState extends State<InputPotongan> {
   TextEditingController txtPot = TextEditingController();
+  final f = NumberFormat("#,###", "id");
 
   @override
   void initState() {
     // TODO: implement initState
-    txtPot.text = (global_var.diskon ?? 0).toString();
+    txtPot.text = f.format((global_var.diskon ?? 0).round()).toString();
   }
 
   @override
@@ -773,7 +869,8 @@ class _InputPotonganState extends State<InputPotongan> {
         children: [
           TextFormField(
             controller: txtPot,
-            style: TextStyle(fontSize: 16.0, color: Colors.black),
+            inputFormatters: [NumericTextFormatter()],
+            style: TextStyle(fontSize: 22.0, color: Colors.black),
             keyboardType: TextInputType.number,
             decoration: InputDecoration(hintText: "Pembayaran"),
           ),
@@ -784,7 +881,12 @@ class _InputPotonganState extends State<InputPotongan> {
               ),
               onPressed: () {
                 setState(() {
-                  global_var.diskon = double.parse(txtPot.text);
+                  global_var.diskon = double.parse((txtPot.text == "")
+                      ? 0
+                      : txtPot.text.replaceAll(".", ""));
+                  global_var.kembalian = global_var.pembayaran +
+                      global_var.diskon -
+                      global_var.total;
                 });
 
                 Navigator.of(context).pop(true);
@@ -808,6 +910,14 @@ class InputBayar extends StatefulWidget {
 class _InputBayarState extends State<InputBayar> {
   TextEditingController txtbayar = TextEditingController();
   bool isTunai = true;
+  final f = NumberFormat("#,###", "id");
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    txtbayar.text = f.format((global_var.pembayaran ?? 0).round()).toString();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -837,7 +947,8 @@ class _InputBayarState extends State<InputBayar> {
           ),
           TextFormField(
             controller: txtbayar,
-            style: TextStyle(fontSize: 16.0, color: Colors.black),
+            inputFormatters: [NumericTextFormatter()],
+            style: TextStyle(fontSize: 22.0, color: Colors.black),
             keyboardType: TextInputType.number,
             decoration: InputDecoration(hintText: "Pembayaran"),
           ),
@@ -848,8 +959,13 @@ class _InputBayarState extends State<InputBayar> {
               ),
               onPressed: () {
                 setState(() {
-                  global_var.pembayaran = double.parse(txtbayar.text);
+                  global_var.pembayaran = double.parse((txtbayar.text == "")
+                      ? 0
+                      : txtbayar.text.replaceAll(".", ""));
                   global_var.isTunai = (isTunai) ? 1 : 0;
+                  global_var.kembalian = global_var.pembayaran +
+                      global_var.diskon -
+                      global_var.total;
                 });
                 Navigator.of(context).pop(true);
               },
