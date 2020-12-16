@@ -142,7 +142,7 @@ class _BottomBarViewState extends State<BottomBarView>
                     child: Container(
                       // alignment: Alignment.center,s
                         decoration: BoxDecoration(
-                        color: FitnessAppTheme.tosca,
+                        color: FitnessAppTheme.yellow,
                         shape: BoxShape.circle,
                         boxShadow: <BoxShadow>[
                           BoxShadow(
@@ -162,7 +162,7 @@ class _BottomBarViewState extends State<BottomBarView>
                             widget.addClick();
                           },
                           child: Icon(
-                            Icons.add,
+                            Icons.attach_money,
                             color: FitnessAppTheme.white,
                             size: 32,
                           ),

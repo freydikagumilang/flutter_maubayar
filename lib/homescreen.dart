@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:maubayar/dashboard/dashboard.dart';
 import 'package:maubayar/masterdata.dart';
 import 'package:maubayar/models/tabIcon_data.dart';
+import 'package:maubayar/ui_view/biaya/input_biaya.dart';
 import 'bottom_navigation_view/bottom_bar_view.dart';
 import 'fintness_app_theme.dart';
 
@@ -37,6 +38,8 @@ class _HomeScreenState extends State<HomeScreen>with TickerProviderStateMixin {
       tabBody = Dashboard();
     }else if(widget.tab_id==1){
       tabBody = MasterData();
+    }else if(widget.tab_id==2){
+      tabBody = InputBiaya();
     }
     
 
@@ -111,6 +114,16 @@ class _HomeScreenState extends State<HomeScreen>with TickerProviderStateMixin {
                 setState(() {
                   tabBody =
                       MasterData();
+                });
+              });
+            }else if (index == 2) {
+              animationController.reverse().then<dynamic>((data) {
+                if (!mounted) {
+                  return;
+                }
+                setState(() {
+                  tabBody =
+                      InputBiaya();
                 });
               });
             }

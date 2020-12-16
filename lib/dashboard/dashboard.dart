@@ -19,6 +19,7 @@ class _DashboardState extends State<Dashboard> {
         child: Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(
+        padding: EdgeInsets.only(top: 30),
         color: FitnessAppTheme.tosca,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

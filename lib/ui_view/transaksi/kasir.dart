@@ -14,6 +14,7 @@ import 'package:maubayar/models/produkmodel.dart';
 import 'package:maubayar/txtformater.dart';
 import 'package:maubayar/ui_view/template/frxappbar.dart';
 import 'package:intl/intl.dart';
+import 'package:maubayar/ui_view/transaksi/printnota.dart';
 import 'package:uuid/uuid.dart';
 
 class Kasir extends StatefulWidget {
@@ -88,8 +89,8 @@ class KasirState extends State<Kasir> with SingleTickerProviderStateMixin {
                   ],
                   color: FitnessAppTheme.tosca,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
+                    topLeft: Radius.circular(15),
+                    topRight: Radius.circular(15),
                   ),
                 ),
                 child: TabBar(
@@ -703,19 +704,21 @@ class _KasirCheckoutState extends State<KasirCheckout> {
           RaisedButton(
             elevation: 5,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30.0),
+                borderRadius: BorderRadius.circular(20.0),
               ),
-              onPressed: () {},
-              color: Colors.amber[600],
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(builder: (_)=>PrintNota()));
+              },
+              color: Colors.amber[700],
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.save),
+                    
                     Text(
                       "Simpan Transaksi",
-                      style: TextStyle(fontSize: 25.0,),
+                      style: TextStyle(fontSize: 25.0,color: Colors.white),
                     ),
                   ],
                 ),

@@ -36,8 +36,8 @@ class TabIconData {
       index: 2,
       isSelected: false,
       animationController: null,
-      menu:"Setting",
-      icon: Icons.settings
+      menu:"Biaya",
+      icon: Icons.money_off
     ),
     TabIconData(
       index: 3,

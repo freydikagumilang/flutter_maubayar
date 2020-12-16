@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maubayar/dashboard/dashboard.dart';
+import 'package:maubayar/fintness_app_theme.dart';
 import 'package:maubayar/homescreen.dart';
 import 'package:maubayar/masterdata.dart';
 import 'package:maubayar/models/produkmodel.dart';
@@ -15,25 +16,36 @@ void main() {
 
 class MyApp extends StatelessWidget {
   final int tab_id;
-  MyApp({this.tab_id=0});
+  MyApp({this.tab_id = 0});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: ()async=>false,
-          child: MaterialApp(
+      onWillPop: () async => false,
+      child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        routes: <String,WidgetBuilder>{
-            '/dashboard':(context)=> new MyApp(tab_id: 2),//Kategori(),
-            '/masterdata':(context)=> new MyApp(tab_id: 1,),//Kategori(),
-            '/kategori':(context)=> new Kategori(),//Kategori(),
-            '/produk':(context)=> new Produk(),//Produk(),
-            '/pelanggan':(context)=> new Pelanggan(),
-            '/kapster':(context)=> new Kapster(),
-            '/kasir':(context)=> new Kasir(),
-          },
-        home: HomeScreen(tab_id: tab_id,),
+        routes: <String, WidgetBuilder>{
+          '/dashboard': (context) => new MyApp(tab_id: 0), //Kategori(),
+          '/masterdata': (context) => new MyApp(
+                tab_id: 1,
+              ), //Kategori(),
+          '/kategori': (context) => new Kategori(), //Kategori(),
+          '/produk': (context) => new Produk(), //Produk(),
+          '/pelanggan': (context) => new Pelanggan(),
+          '/kapster': (context) => new Kapster(),
+          '/kasir': (context) => new Kasir(),
+        },
+        theme: ThemeData(
+          cursorColor: Colors.grey,
+          dialogBackgroundColor: Colors.white,
+          colorScheme: ColorScheme.light(primary: Colors.tealAccent[700]),
+          textSelectionColor: Colors.grey,
+          fontFamily: 'SFProDisplay'
+        ),
+        home: HomeScreen(
+          tab_id: tab_id,
+        ),
       ),
     );
   }
