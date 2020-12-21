@@ -15,7 +15,6 @@ import 'package:maubayar/txtformater.dart';
 import 'package:maubayar/ui_view/template/frxappbar.dart';
 import 'package:intl/intl.dart';
 import 'package:maubayar/ui_view/transaksi/printnota.dart';
-import 'package:uuid/uuid.dart';
 
 class Kasir extends StatefulWidget {
   @override
@@ -38,10 +37,7 @@ class KasirState extends State<Kasir> with SingleTickerProviderStateMixin {
   void initState() {
     // TODO: implement initState
     tabct = new TabController(vsync: this, length: 3);
-    if (global_var.inv_temp_id == "") {
-      var uuid = Uuid();
-      global_var.inv_temp_id = uuid.v1();
-    }
+    
   }
 
   @override
@@ -67,6 +63,7 @@ class KasirState extends State<Kasir> with SingleTickerProviderStateMixin {
           BlocProvider<Getproduk>(create: (context) => Getproduk(prod)),
           BlocProvider<Getpelanggan>(create: (context) => Getpelanggan(plg)),
           BlocProvider<InsertDet>(create: (context) => InsertDet(0.0)),
+          BlocProvider<CreateNota>(create: (context) => CreateNota(0)),
         ],
         child: Scaffold(
           appBar: FrxAppBar("Kasir", backroute: "/masterdata"),
@@ -138,7 +135,7 @@ class _SearchItemState extends State<SearchItem> {
 
   @override
   Widget build(BuildContext context) {
-    var NumFormat = new NumberFormat.compact(locale: "id");
+    var NumFormat = new NumberFormat.compact(locale: "en");
     Getproduk bloc = BlocProvider.of<Getproduk>(context);
     return Container(
       padding: EdgeInsets.all(8),
@@ -335,8 +332,10 @@ class KasirCheckout extends StatefulWidget {
 
 class _KasirCheckoutState extends State<KasirCheckout> {
   var NumFormat = new NumberFormat.compact(locale: "en");
+  String _newInvNo="";
   @override
   Widget build(BuildContext context) {
+    CreateNota _creatorNota = BlocProvider.of<CreateNota>(context);
     return Container(
       padding: EdgeInsets.all(10),
       color: FitnessAppTheme.tosca,
@@ -473,10 +472,14 @@ class _KasirCheckoutState extends State<KasirCheckout> {
                                             });
                                           },
                                         ),
-                                        Text(
-                                            global_var.detailkasir[idx]
-                                                .invdet_prod_nama,
-                                            style: TextStyle(fontSize: 22)),
+                                        Flexible(
+                                                                                  child: Text(
+                                              global_var.detailkasir[idx]
+                                                  .invdet_kat_nama+"\n"+global_var.detailkasir[idx]
+                                                  .invdet_prod_nama,
+                                              style: TextStyle(fontSize: 20)
+                                              ),
+                                        ),
                                       ],
                                     ),
                                     Text(
@@ -606,7 +609,7 @@ class _KasirCheckoutState extends State<KasirCheckout> {
                       TableRow(children: [
                         Padding(
                             padding: EdgeInsets.all(2.0),
-                            child: Text("Pembayaran",
+                            child: Text((global_var.isTunai==1) ? "Tunai" : "Non-Tunai",
                                 textAlign: TextAlign.right,
                                 style: TextStyle(
                                     fontSize: 20,
@@ -707,6 +710,22 @@ class _KasirCheckoutState extends State<KasirCheckout> {
                 borderRadius: BorderRadius.circular(20.0),
               ),
               onPressed: () {
+                
+                _newInvNo = "INV"+DateTime.now().millisecondsSinceEpoch.toString();
+                int _unixtime =DateTime.now().millisecondsSinceEpoch;
+
+                invoice newInvoice = invoice(_newInvNo,
+                  DateTime.now().toString(),
+                  global_var.kasirpelanggan.pelanggan_id,
+                  global_var.total,
+                  global_var.diskon,
+                  global_var.total-global_var.diskon,
+                  _unixtime,
+                  0,
+                  _unixtime,
+                  details: global_var.detailkasir
+                );
+                //_creatorNota.add(newInvoice); // Simpan Nota
                 Navigator.of(context).push(MaterialPageRoute(builder: (_)=>PrintNota()));
               },
               color: Colors.amber[700],
@@ -715,7 +734,6 @@ class _KasirCheckoutState extends State<KasirCheckout> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    
                     Text(
                       "Simpan Transaksi",
                       style: TextStyle(fontSize: 25.0,color: Colors.white),
@@ -817,7 +835,7 @@ class _PilihKapsterState extends State<PilihKapster> {
                   produk _prod = widget.add_prod;
                   int _date = DateTime.now().microsecondsSinceEpoch;
                   invoicedet itemdet = await invoicedet(
-                      global_var.inv_temp_id,
+                      0,
                       _prod.prod_id,
                       txtketItem.text.toString(),
                       1,
@@ -829,7 +847,9 @@ class _PilihKapsterState extends State<PilihKapster> {
                       0,
                       0,
                       invdet_prod_nama: _prod.prod_nama,
-                      invdet_kapster_name: detkapster.kapster_nama);
+                      invdet_kapster_name: detkapster.kapster_nama,
+                      invdet_kat_nama:_prod.kat_nama,
+                      invdet_kat_komisi: _prod.komisi_kat);
                   _insertDet.add(itemdet);
                   Navigator.of(context).pop(true);
                   widget.tabnavigator(2);

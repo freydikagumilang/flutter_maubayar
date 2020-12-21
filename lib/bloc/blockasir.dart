@@ -17,3 +17,24 @@ class InsertDet extends Bloc<invoicedet, double> {
     yield global_var.total;
   }
 }
+class CreateNota extends Bloc<invoice,int>{
+  final _notaDAO = invoiceDAO();
+  CreateNota(int initialState) : super(initialState);
+
+  @override
+  Stream<int> mapEventToState(invoice event) async* {
+    int id;
+    try {
+      if(event.inv_id!=0 && event.inv_id!=null){
+        id = await _notaDAO.updateInv(event);
+      }else{        
+        id = await _notaDAO.saveInv(event);    
+      }
+      yield id;
+    } catch (e) {
+      print("error");
+      print(e);
+    }
+  }
+
+}

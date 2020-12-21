@@ -43,8 +43,8 @@ class TabIconData {
       index: 3,
       isSelected: false,
       animationController: null,
-      menu:"Profile",
-      icon: Icons.account_circle
+      menu:"Setting",
+      icon: Icons.settings
     ),
   ];
 }

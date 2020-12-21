@@ -30,6 +30,7 @@ class MyApp extends StatelessWidget {
           '/masterdata': (context) => new MyApp(
                 tab_id: 1,
               ), //Kategori(),
+          '/sysconfig': (context) => new MyApp(tab_id: 3), //Kategori(),
           '/kategori': (context) => new Kategori(), //Kategori(),
           '/produk': (context) => new Produk(), //Produk(),
           '/pelanggan': (context) => new Pelanggan(),
@@ -37,12 +38,11 @@ class MyApp extends StatelessWidget {
           '/kasir': (context) => new Kasir(),
         },
         theme: ThemeData(
-          cursorColor: Colors.grey,
-          dialogBackgroundColor: Colors.white,
-          colorScheme: ColorScheme.light(primary: Colors.tealAccent[700]),
-          textSelectionColor: Colors.grey,
-          fontFamily: 'SFProDisplay'
-        ),
+            cursorColor: Colors.grey,
+            dialogBackgroundColor: Colors.white,
+            colorScheme: ColorScheme.light(primary: Colors.tealAccent[700]),
+            textSelectionColor: Colors.grey,
+            fontFamily: 'SFProDisplay'),
         home: HomeScreen(
           tab_id: tab_id,
         ),

@@ -9,5 +9,4 @@ class global_var {
   static double total=0;
   static int isTunai=0;
   static List<invoicedet> detailkasir;
-  static String inv_temp_id = "";
 }
