@@ -41,6 +41,8 @@ class _HomeScreenState extends State<HomeScreen>with TickerProviderStateMixin {
       tabBody = MasterData();
     }else if(widget.tab_id==2){
       tabBody = InputBiaya();
+    }else if(widget.tab_id==3){
+      tabBody = SysConfig();
     }
     
 

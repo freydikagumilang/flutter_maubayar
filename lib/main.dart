@@ -8,6 +8,7 @@ import 'package:maubayar/ui_view/masterdata/kapster.dart';
 import 'package:maubayar/ui_view/masterdata/pelanggan.dart';
 import 'package:maubayar/ui_view/produk/produk.dart';
 import 'package:maubayar/ui_view/produk/kategori.dart';
+import 'package:maubayar/ui_view/sysconfig/sysconfig.dart';
 import 'package:maubayar/ui_view/transaksi/kasir.dart';
 
 void main() {
@@ -31,6 +32,8 @@ class MyApp extends StatelessWidget {
                 tab_id: 1,
               ), //Kategori(),
           '/sysconfig': (context) => new MyApp(tab_id: 3), //Kategori(),
+          '/company_profile': (context) => new CompanyConfig(), //Kategori(),
+          '/printer_config': (context) => new PrinterConfig(), //Kategori(),
           '/kategori': (context) => new Kategori(), //Kategori(),
           '/produk': (context) => new Produk(), //Produk(),
           '/pelanggan': (context) => new Pelanggan(),
