@@ -10,10 +10,12 @@ import 'package:maubayar/txtformater.dart';
 import 'package:maubayar/ui_view/produk/produk.dart';
 import 'package:maubayar/ui_view/template/frxappbar.dart';
 import 'package:intl/intl.dart';
+import 'package:maubayar/ui_view/transaksi/kasir.dart';
 
 class InputProduk extends StatefulWidget {
   final produk edit_prod;
-  InputProduk({this.edit_prod});
+  final int fromkasir;
+  InputProduk({this.edit_prod, this.fromkasir});
 
   @override
   _InputProdukState createState() => _InputProdukState();
@@ -26,7 +28,8 @@ class _InputProdukState extends State<InputProduk> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        Navigator.of(context, rootNavigator: true).pushNamed("/produk");
+        Navigator.of(context, rootNavigator: true)
+            .pushNamed((widget.fromkasir == 1) ? "/kasir" : "/produk");
       },
       child: MultiBlocProvider(
         providers: [
@@ -35,14 +38,18 @@ class _InputProdukState extends State<InputProduk> {
         ],
         child: Scaffold(
           backgroundColor: FitnessAppTheme.tosca,
-          appBar: FrxAppBar(((widget.edit_prod != null)
-              ? "Edit Produk / Layanan"
-              : "Input Produk / Layanan"),backroute: "/produk",),
+          appBar: FrxAppBar(
+            ((widget.edit_prod != null)
+                ? "Edit Produk / Layanan"
+                : "Input Produk / Layanan"),
+            backroute: ((widget.fromkasir == 1) ? "/kasir" : "/produk"),
+          ),
           body: Container(
               height: MediaQuery.of(context).size.height / 2,
               padding: EdgeInsets.all(10),
               child: InputForm(
                 edit_prod: widget.edit_prod,
+                fromkasir: widget.fromkasir,
               )),
         ),
       ),
@@ -52,7 +59,8 @@ class _InputProdukState extends State<InputProduk> {
 
 class InputForm extends StatefulWidget {
   final produk edit_prod;
-  InputForm({this.edit_prod});
+  final int fromkasir;
+  InputForm({this.edit_prod, this.fromkasir});
   @override
   _InputFormState createState() => _InputFormState();
 }
@@ -177,8 +185,13 @@ class _InputFormState extends State<InputForm> {
                   }
                   Createproduk creator = Createproduk("");
                   creator.add(newprod);
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Produk()));
+                  if (widget.fromkasir == 1) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Kasir()));
+                  } else {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Produk()));
+                  }
                 },
                 child: Text(
                   "Simpan",

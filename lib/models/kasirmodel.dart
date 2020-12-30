@@ -183,7 +183,8 @@ class invoiceDAO {
     from invoice 
     inner join pelanggan
       on inv_plg_id = pelanggan_id
-    where (inv_no like "%${cari}%" or pelanggan_nama like "%${cari}%" or pelanggan_hp like "%${cari}%") and  inv_deleted_at = 0''';
+    where (inv_no like "%${cari}%" or pelanggan_nama like "%${cari}%" or 
+    pelanggan_hp like "%${cari}%") and  inv_deleted_at = 0''';
 
     List<Map> datalist = await dbClient.rawQuery(sSQL);
     List<invoice> list_inv = new List();
@@ -227,11 +228,21 @@ class invoiceDAO {
 
     int res = await dbClient.insert("invoice", inv.toMap());
 
-    print("inv_id:" + res.toString());
+    // print("inv_id:" + res.toString());
     List<invoicedet> _details = inv.details;
     for (var i = 0; i < _details.length; i++) {
+      int _prod_id = _details[i].invdet_item_id;
+
       await _details[i].setInvId(res);
       await dbClient.insert("invoicedet", _details[i].toMap());
+      
+
+      sSQLdet = '''update produk set prod_sale_retention = prod_sale_retention + 1
+                where prod_id = $_prod_id ''';
+      print(sSQLdet);
+      await dbClient.rawQuery(sSQLdet);
+
+
     }
     return res;
   }

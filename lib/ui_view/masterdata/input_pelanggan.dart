@@ -8,17 +8,23 @@ import 'package:maubayar/ui_view/template/frxappbar.dart';
 
 class InputPelanggan extends StatefulWidget {
   final pelanggan editPlg;
-  InputPelanggan({this.editPlg});
+  final int fromkasir;
+  InputPelanggan({this.editPlg,this.fromkasir});
   @override
   InputPelangganState createState() => InputPelangganState();
 }
 
 class InputPelangganState extends State<InputPelanggan> {
   @override
+  void initState() {
+    // TODO: implement initState
+    print(widget.fromkasir);
+  }
+  @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        Navigator.of(context, rootNavigator: true).pushNamed("/pelanggan");
+        Navigator.of(context, rootNavigator: true).pushNamed(((widget.fromkasir==1)?"/kasir":"/pelanggan"));
       },
       child: BlocProvider<Createpelanggan>(
           create: (BuildContext context) => Createpelanggan(""),
@@ -26,13 +32,14 @@ class InputPelangganState extends State<InputPelanggan> {
             backgroundColor: FitnessAppTheme.tosca,
             appBar: FrxAppBar(
               ((widget.editPlg != null) ? "Edit Pelanggan" : "Input Pelanggan"),
-              backroute: "/pelanggan",
+              backroute: ((widget.fromkasir==1)?"/kasir":"/pelanggan"),
             ),
             body: Container(
                 height: MediaQuery.of(context).size.height / 2,
                 padding: EdgeInsets.all(10),
                 child: InputFormPelanggan(
                   editplg: widget.editPlg,
+                  fromkasir: widget.fromkasir,
                 )),
           )),
     );
@@ -41,7 +48,8 @@ class InputPelangganState extends State<InputPelanggan> {
 
 class InputFormPelanggan extends StatefulWidget {
   final pelanggan editplg;
-  InputFormPelanggan({this.editplg});
+  final int fromkasir;
+  InputFormPelanggan({this.editplg,this.fromkasir=0});
   @override
   _InputFormPelangganState createState() => _InputFormPelangganState();
 }
@@ -103,8 +111,13 @@ class _InputFormPelangganState extends State<InputFormPelanggan> {
                   }
                   Createpelanggan creator = Createpelanggan("");
                   creator.add(newplg);
-                  Navigator.push(context,
+                  if((widget.fromkasir==1)){
+                    Navigator.of(context, rootNavigator: true).pushNamed("/kasir");
+                  }else{
+                    Navigator.push(context,
                       MaterialPageRoute(builder: (context) => Pelanggan()));
+                  }
+                  
                 },
                 child: Text(
                   "Simpan",

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:maubayar/fintness_app_theme.dart';
+import 'package:intl/intl.dart';
 
 class AllChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 400,
+      height: 250,
       child: ListView(
         // This next line does the trick.
         scrollDirection: Axis.horizontal,
@@ -25,6 +26,7 @@ class DashboardChart extends StatefulWidget {
 }
 
 class _DashboardChartState extends State<DashboardChart> {
+  var NumCompact = new NumberFormat.compact(locale: "id");
   @override
   Widget build(BuildContext context) {
     var data = [
@@ -39,23 +41,33 @@ class _DashboardChartState extends State<DashboardChart> {
 
     var series = [
       charts.Series(
-          domainFn: (SalesData sales, _) => sales.date,
-          measureFn: (SalesData sales, _) => sales.amount,
-          colorFn: (SalesData sales, _) => sales.clr,
-          id: 'lastweek',
-          data: data)
+        domainFn: (SalesData sales, _) => sales.date,
+        measureFn: (SalesData sales, _) => sales.amount,
+        colorFn: (SalesData sales, _) => sales.clr,
+        id: 'lastweek',
+        data: data,
+      )
     ];
 
-    var mychart = charts.BarChart(series);
+    var mychart = charts.BarChart(
+      series,
+      primaryMeasureAxis:
+          new charts.NumericAxisSpec(renderSpec: new charts.NoneRenderSpec()),
+      // domainAxis: new charts.OrdinalAxisSpec(
+      //     showAxisLine: true, renderSpec: new charts.NoneRenderSpec()),
+    );
     return Container(
-      width: MediaQuery.of(context).size.width,
+      width: MediaQuery.of(context).size.width/1.1,
       child: Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: EdgeInsets.fromLTRB(0, 5, 10, 5),
         child: Card(
           color: FitnessAppTheme.white,
           elevation: 3,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(5, 8, 0, 8),
+            padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
             child: Column(
               children: <Widget>[
                 new Text(
@@ -63,7 +75,8 @@ class _DashboardChartState extends State<DashboardChart> {
                   style: new TextStyle(fontSize: 18),
                 ),
                 new SizedBox(
-                  height: 300.0,
+                  height: 180.0,
+                  width: MediaQuery.of(context).size.width / 1.1,
                   child: mychart,
                 ),
               ],
@@ -116,12 +129,15 @@ class _ItemStatePieChart extends State<ItemPieChart> {
           arcRendererDecorators: [charts.ArcLabelDecorator()]),
     );
     return Container(
-      width: MediaQuery.of(context).size.width,
+      width: MediaQuery.of(context).size.width/1.1,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.fromLTRB(10, 5, 0, 5),
         child: Card(
           color: FitnessAppTheme.white,
           elevation: 3,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
           child: Padding(
             padding: EdgeInsets.all(8.0),
             child: Column(
@@ -131,7 +147,7 @@ class _ItemStatePieChart extends State<ItemPieChart> {
                   style: new TextStyle(fontSize: 18),
                 ),
                 new SizedBox(
-                  height: 300.0,
+                  height: 180.0,
                   child: mychart,
                 ),
               ],

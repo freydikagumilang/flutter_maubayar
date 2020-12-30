@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:maubayar/dashboard/dashboardchart.dart';
 import 'package:maubayar/fintness_app_theme.dart';
+import 'package:intl/intl.dart';
 
 class Dashboard extends StatefulWidget {
   @override
@@ -9,30 +10,49 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  
+  DateTime selectedDate = DateTime.now();
+  var formatter = new DateFormat.yMMMMd();
+  @override
+  void initState() {
+    // TODO: implement initState
+  }
+
   @override
   Widget build(BuildContext context) {
-    PageController _chartPage = PageController(
-      initialPage: 1
-    );
+    PageController _chartPage = PageController(initialPage: 1);
     return Container(
         child: Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(
-        padding: EdgeInsets.only(top: 30),
+        padding: EdgeInsets.fromLTRB(20, 40, 20, 10),
         color: FitnessAppTheme.tosca,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            CashBalance(),
-            Divider(
-              height: 20,
-              thickness: 2,
-              indent: 20,
-              endIndent: 20,
-              color: FitnessAppTheme.grey.withOpacity(0.1),
+            GestureDetector(
+              onTap: () async {
+                final DateTime picked = await showDatePicker(
+                  context: context,
+                  initialDate: selectedDate, // Refer step 1
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2025),
+                  cancelText: "Batal",
+                  confirmText: "Pilih",
+                );
+                if (picked != null && picked != selectedDate)
+                  setState(() {
+                    selectedDate = picked;
+                  });
+              },
+              child: Text(
+                "${formatter.format(selectedDate)}",
+                style: TextStyle(
+                    fontSize: 40,
+                    fontWeight: FontWeight.bold,
+                    color: FitnessAppTheme.white),
+              ),
             ),
-            // Expanded(child: AllChart()),
+            CashBalance(),
             AllChart()
           ],
         ),
@@ -47,11 +67,16 @@ class CashBalance extends StatefulWidget {
 }
 
 class _CashBalanceState extends State<CashBalance> {
+  var NumCompact = new NumberFormat.compact(locale: "id");
+  var NumDec = new NumberFormat.decimalPattern("id");
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(8,30,8,0),
+      padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
       child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
         elevation: 3,
         color: FitnessAppTheme.white,
         child: Padding(
@@ -68,7 +93,7 @@ class _CashBalanceState extends State<CashBalance> {
               ),
               Padding(padding: EdgeInsets.only(top: 10)),
               Text(
-                "RP 5.000.000",
+                NumDec.format(5000000),
                 style: TextStyle(
                   fontSize: 40.0,
                 ),
@@ -83,7 +108,7 @@ class _CashBalanceState extends State<CashBalance> {
                     size: 40,
                   ),
                   Text(
-                    "RP 5.000.000",
+                    NumDec.format(320000),
                     style: TextStyle(
                       fontSize: 18.0,
                     ),

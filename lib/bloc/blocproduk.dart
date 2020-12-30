@@ -1,5 +1,6 @@
 import 'package:maubayar/models/produkmodel.dart';
 import 'package:bloc/bloc.dart';
+import 'package:maubayar/ui_view/transaksi/kasir.dart';
 
 class Createproduk extends Bloc<produk,String>{
   final prodDAO = produkDAO();
@@ -42,6 +43,21 @@ class Getproduk extends Bloc<String, List<produk>>{
 
 }
 
+class SearchItemKasir extends Bloc<String, List<produk>>{
+  final prodDAO = produkDAO();
+
+  SearchItemKasir(List<produk> initialState) : super(initialState);
+    
+  @override
+  Stream<List<produk>> mapEventToState(String event)async* {
+    try {
+      List<produk> listprod = await prodDAO.SearchItemKasir(event);
+      yield listprod;
+    } catch (e) {
+      print("error : ${e}");
+    }
+  }
+}
 class Deleteproduk extends Bloc<int,int>{
   final prodDAO = produkDAO();
   Deleteproduk(int initialState) : super(initialState);
@@ -55,5 +71,4 @@ class Deleteproduk extends Bloc<int,int>{
 
     }
   }
-  
 }

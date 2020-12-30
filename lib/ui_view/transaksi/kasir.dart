@@ -10,9 +10,12 @@ import 'package:maubayar/global_var.dart';
 import 'package:maubayar/main.dart';
 import 'package:maubayar/models/kapstermodel.dart';
 import 'package:maubayar/models/kasirmodel.dart';
+import 'package:maubayar/models/kasmodel.dart';
 import 'package:maubayar/models/pelangganmodel.dart';
 import 'package:maubayar/models/produkmodel.dart';
 import 'package:maubayar/txtformater.dart';
+import 'package:maubayar/ui_view/masterdata/input_pelanggan.dart';
+import 'package:maubayar/ui_view/produk/input_produk.dart';
 import 'package:maubayar/ui_view/template/frxappbar.dart';
 import 'package:intl/intl.dart';
 import 'package:maubayar/ui_view/transaksi/printnota.dart';
@@ -63,10 +66,12 @@ class KasirState extends State<Kasir> with SingleTickerProviderStateMixin {
       child: MultiBlocProvider(
         providers: [
           BlocProvider<Getkapster>(create: (context) => Getkapster(kaps)),
-          BlocProvider<Getproduk>(create: (context) => Getproduk(prod)),
+          BlocProvider<SearchItemKasir>(
+              create: (context) => SearchItemKasir(prod)),
           BlocProvider<Getpelanggan>(create: (context) => Getpelanggan(plg)),
           BlocProvider<InsertDet>(create: (context) => InsertDet(0.0)),
           BlocProvider<CreateNota>(create: (context) => CreateNota(0)),
+          BlocProvider<CreateBukuKas>(create: (context) => CreateBukuKas(0)),
         ],
         child: Scaffold(
           appBar: FrxAppBar("Kasir", backroute: "/masterdata"),
@@ -131,7 +136,7 @@ class _SearchItemState extends State<SearchItem> {
     // TODO: implement initState
     FocusManager.instance.primaryFocus.unfocus();
     Future.delayed(Duration.zero, () {
-      Getproduk bloc = BlocProvider.of<Getproduk>(context);
+      SearchItemKasir bloc = BlocProvider.of<SearchItemKasir>(context);
       bloc.add("");
     });
   }
@@ -139,87 +144,114 @@ class _SearchItemState extends State<SearchItem> {
   @override
   Widget build(BuildContext context) {
     var NumFormat = new NumberFormat.compact(locale: "en");
-    Getproduk bloc = BlocProvider.of<Getproduk>(context);
+    SearchItemKasir bloc = BlocProvider.of<SearchItemKasir>(context);
     return Container(
       padding: EdgeInsets.all(8),
       color: FitnessAppTheme.tosca,
-      child: BlocBuilder<Getproduk, List<produk>>(
+      child: BlocBuilder<SearchItemKasir, List<produk>>(
         builder: (context, dt_item) => Column(
           children: [
-            Card(
-                color: FitnessAppTheme.white,
-                child: TextFormField(
-                  controller: txtcariprod,
-                  style: TextStyle(fontSize: 20.0, color: Colors.black),
-                  decoration: InputDecoration(
-                      hintText: "Cari Produk",
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: FitnessAppTheme.tosca,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  flex: 10,
+                  child: Card(
+                      color: FitnessAppTheme.white,
+                      child: TextFormField(
+                        controller: txtcariprod,
+                        style: TextStyle(fontSize: 20.0, color: Colors.black),
+                        decoration: InputDecoration(
+                            hintText: "Cari Produk",
+                            prefixIcon: Icon(
+                              Icons.search,
+                              color: FitnessAppTheme.tosca,
+                            )),
+                        onChanged: (val) {
+                          Future.delayed(Duration(milliseconds: 500), () {
+                            bloc.add(val);
+                          });
+                        },
                       )),
-                  onChanged: (val) {
-                    Future.delayed(Duration(milliseconds: 500), () {
-                      bloc.add(val);
-                    });
-                  },
-                )),
+                ),
+                Flexible(
+                  flex: 2,
+                  child: FlatButton(
+                      padding: EdgeInsets.all(0),
+                      height: 48,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      color: FitnessAppTheme.yellow,
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => InputProduk(
+                                      fromkasir: 1,
+                                    )));
+                      },
+                      child: Icon(
+                        Icons.add,
+                        size: 30,
+                        color: FitnessAppTheme.white,
+                      )),
+                ),
+              ],
+            ),
             Expanded(
               child: ListView.builder(
                 itemCount: (dt_item == null) ? 0 : dt_item.length,
                 itemBuilder: (context, idx) {
-                  return Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                dt_item[idx].kat_nama,
-                                style: TextStyle(
-                                    fontSize: 14, color: FitnessAppTheme.grey),
+                  return GestureDetector(
+                    onTap: () {
+                      AlertDialog pilKapster = AlertDialog(
+                        title: Text("Beuatycian"),
+                        content:
+                            PilihKapster(widget.tabnavigator, dt_item[idx]),
+                      );
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return BlocProvider<Getkapster>.value(
+                              value: Getkapster(kaps),
+                              child: BlocProvider<InsertDet>.value(
+                                value: InsertDet(0.0),
+                                child: pilKapster,
                               ),
-                              Padding(padding: EdgeInsets.all(2)),
-                              Text(
-                                dt_item[idx].prod_nama,
-                                style: TextStyle(fontSize: 20),
-                              ),
-                              Padding(padding: EdgeInsets.all(2)),
-                              Text(
-                                NumFormat.format(dt_item[idx].prod_price)
-                                    .toString(),
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ],
-                          ),
-                          GestureDetector(
-                            child: Icon(
-                              Icons.add_circle_outline,
-                              size: 40,
-                              color: FitnessAppTheme.tosca,
+                            );
+                          });
+                    },
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  dt_item[idx].kat_nama,
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: FitnessAppTheme.grey),
+                                ),
+                                Padding(padding: EdgeInsets.all(2)),
+                                Text(
+                                  dt_item[idx].prod_nama,
+                                  style: TextStyle(fontSize: 20),
+                                ),
+                                Padding(padding: EdgeInsets.all(2)),
+                              ],
                             ),
-                            onTap: () {
-                              AlertDialog pilKapster = AlertDialog(
-                                title: Text("Beuatycian"),
-                                content: PilihKapster(
-                                    widget.tabnavigator, dt_item[idx]),
-                              );
-                              showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return BlocProvider<Getkapster>.value(
-                                      value: Getkapster(kaps),
-                                      child: BlocProvider<InsertDet>.value(
-                                        value: InsertDet(0.0),
-                                        child: pilKapster,
-                                      ),
-                                    );
-                                  });
-                            },
-                          ),
-                        ],
+                            Text(
+                              NumFormat.format(dt_item[idx].prod_price)
+                                  .toString(),
+                              style: TextStyle(fontSize: 20),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );
@@ -253,67 +285,99 @@ class _SearchPelangganState extends State<SearchPelanggan> {
         child: BlocBuilder<Getpelanggan, List<pelanggan>>(
           builder: (context, dt_plg) => Column(
             children: [
-              Card(
-                  color: FitnessAppTheme.white,
-                  child: TextFormField(
-                    controller: txtcariplg,
-                    style: TextStyle(fontSize: 20.0, color: Colors.black),
-                    decoration: InputDecoration(
-                        hintText: "Nama / No.HP Pelanggan",
-                        prefixIcon: Icon(
-                          Icons.search,
-                          color: FitnessAppTheme.tosca,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    flex: 10,
+                    child: Card(
+                        color: FitnessAppTheme.white,
+                        child: TextFormField(
+                          controller: txtcariplg,
+                          style: TextStyle(fontSize: 20.0, color: Colors.black),
+                          decoration: InputDecoration(
+                            hintText: "Nama / No.HP Pelanggan",
+                            prefixIcon: Icon(
+                              Icons.search,
+                              color: FitnessAppTheme.tosca,
+                            ),
+                            border: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            errorBorder: InputBorder.none,
+                            disabledBorder: InputBorder.none,
+                          ),
+                          onChanged: (val) {
+                            Future.delayed(Duration(milliseconds: 500), () {
+                              bloc_plg.add(val);
+                            });
+                          },
                         )),
-                    onChanged: (val) {
-                      Future.delayed(Duration(milliseconds: 500), () {
-                        bloc_plg.add(val);
-                      });
-                    },
-                  )),
+                  ),
+                  Flexible(
+                    flex: 2,
+                    child: FlatButton(
+                        padding: EdgeInsets.all(0),
+                        height: 48,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                        color: FitnessAppTheme.yellow,
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => InputPelanggan(
+                                        fromkasir: 1,
+                                      )));
+                        },
+                        child: Icon(
+                          Icons.person_add,
+                          size: 30,
+                          color: FitnessAppTheme.white,
+                        )),
+                  ),
+                ],
+              ),
               Expanded(
                 child: ListView.builder(
                   itemCount: (dt_plg == null) ? 0 : dt_plg.length,
                   itemBuilder: (context, idx) {
-                    return Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  dt_plg[idx].pelanggan_nama,
-                                  style: TextStyle(fontSize: 20),
-                                ),
-                                Text(
-                                  dt_plg[idx].pelanggan_hp.toString(),
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      color: FitnessAppTheme.grey),
-                                ),
-                              ],
-                            ),
-                            GestureDetector(
-                              child: Icon(
-                                Icons.check_circle_outline,
-                                size: 30,
-                                color: FitnessAppTheme.tosca,
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          global_var.kasirpelanggan = pelanggan(
+                              dt_plg[idx].pelanggan_nama,
+                              dt_plg[idx].pelanggan_hp,
+                              dt_plg[idx].pelanggan_alamat);
+                          global_var.kasirpelanggan
+                              .setId(dt_plg[idx].pelanggan_id);
+                        });
+                        widget.tabnavigator(2);
+                      },
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    dt_plg[idx].pelanggan_nama,
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                  Text(
+                                    dt_plg[idx].pelanggan_hp.toString(),
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        color: FitnessAppTheme.grey),
+                                  ),
+                                ],
                               ),
-                              onTap: () {
-                                setState(() {
-                                  global_var.kasirpelanggan = pelanggan(
-                                      dt_plg[idx].pelanggan_nama,
-                                      dt_plg[idx].pelanggan_hp,
-                                      dt_plg[idx].pelanggan_alamat);
-                                  global_var.kasirpelanggan
-                                      .setId(dt_plg[idx].pelanggan_id);
-                                });
-                                widget.tabnavigator(2);
-                              },
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     );
@@ -350,7 +414,7 @@ class _KasirCheckoutState extends State<KasirCheckout> {
   @override
   void initState() {
     // TODO: implement initState
-
+    global_var.isSaved = 0;
     gb.getPref("nama_bisnis").then((val) {
       _nama_bisnis = val;
       setState(() {});
@@ -377,6 +441,7 @@ class _KasirCheckoutState extends State<KasirCheckout> {
   Widget build(BuildContext context) {
     int bl_stat = 1;
     CreateNota _creatorNota = BlocProvider.of<CreateNota>(context);
+    CreateBukuKas _creatorBukukas = BlocProvider.of<CreateBukuKas>(context);
     return Container(
       padding: EdgeInsets.all(10),
       color: FitnessAppTheme.tosca,
@@ -755,16 +820,19 @@ class _KasirCheckoutState extends State<KasirCheckout> {
               ),
               onPressed: () async {
                 _bluetoothManager.state.listen((val) {
-                  print("state = $val");
                   if (!mounted) return;
                   if (val == 10) {
                     bl_stat = 0;
                     AlertDialog checkbluetooth = AlertDialog(
-                      title: Text("Bluetooth Nonaktif",style: TextStyle(fontWeight: FontWeight.w700),),
+                      title: Text(
+                        "Bluetooth Nonaktif",
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
                       content: Container(
-                          height: MediaQuery.of(context).size.height / 15,
-                          child: Text(
-                                  "Harap aktifkan Bluetooth anda untuk terhubung ke printer "),),
+                        height: MediaQuery.of(context).size.height / 15,
+                        child: Text(
+                            "Harap aktifkan Bluetooth anda untuk terhubung ke printer "),
+                      ),
                     );
                     showDialog(
                         context: context,
@@ -772,23 +840,52 @@ class _KasirCheckoutState extends State<KasirCheckout> {
                           return checkbluetooth;
                         });
                   } else if (val == 12) {
-                    _newInvNo = "INV" +
-                        DateTime.now().millisecondsSinceEpoch.toString();
-                    int _unixtime = DateTime.now().millisecondsSinceEpoch;
-                    print(_newInvNo);
+                    if (global_var.isSaved == 0) {
+                      _newInvNo = "INV" +
+                          DateTime.now().millisecondsSinceEpoch.toString();
+                      int _unixtime = DateTime.now().millisecondsSinceEpoch;
+                      int _unixtime_today = global_var.unixtime_today;
 
-                    invoice newInvoice = invoice(
-                        _newInvNo,
-                        DateTime.now().toString(),
-                        global_var.kasirpelanggan.pelanggan_id,
-                        global_var.total,
-                        global_var.diskon,
-                        global_var.total - global_var.diskon,
-                        _unixtime,
-                        0,
-                        _unixtime,
-                        details: global_var.detailkasir);
-                    //_creatorNota.add(newInvoice); // Simpan Nota
+                      invoice newInvoice = invoice(
+                          _newInvNo,
+                          DateTime.now().toString(),
+                          global_var.kasirpelanggan.pelanggan_id,
+                          global_var.total,
+                          global_var.diskon,
+                          global_var.total - global_var.diskon,
+                          _unixtime,
+                          0,
+                          _unixtime,
+                          details: global_var.detailkasir);
+                      // _creatorNota.add(newInvoice); // Simpan Nota
+                      bukukasdet _bukukasdet = bukukasdet(
+                          ((global_var.isTunai == 1)
+                              ? global_var.pembayaran
+                              : 0),
+                          ((global_var.isTunai == 0)
+                              ? global_var.pembayaran
+                              : 0),
+                          "Penjualan Nota : {$_newInvNo}",
+                          _unixtime_today,
+                          _unixtime,
+                          0);
+
+                      bukukas _bukukas = bukukas(
+                          ((global_var.isTunai == 1)
+                              ? global_var.pembayaran
+                              : 0),
+                          ((global_var.isTunai == 0)
+                              ? global_var.pembayaran
+                              : 0),
+                          _unixtime_today,
+                          _unixtime,
+                          0,
+                          detail_bukukas: _bukukasdet);
+                      // _creatorBukukas.add(_bukukas); // saving buku kas
+                      global_var.isSaved = 1;
+                      setState(() {}); 
+                      print("isSaved:"+global_var.isSaved.toString());
+                    }
                     if (global_var.default_printer == null) {
                       Navigator.of(context)
                           .push(

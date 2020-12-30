@@ -48,15 +48,12 @@ class _InputBiayaState extends State<InputBiaya> {
                 child: Text(
                   "${formatter.format(selectedDate)}",
                   style: TextStyle(
-                      fontSize: 55,
+                      fontSize: 50,
                       fontWeight: FontWeight.bold,
                       color: FitnessAppTheme.white),
                 ),
               ),
-              Card(
-                color: FitnessAppTheme.yellow,
-                child: Text("500K"),
-              )
+              
             ],
           ),
         ),

@@ -86,7 +86,8 @@ class produkDAO {
     prod_stock REAL,
     prod_price REAL,
     prod_cogs REAL,
-    prod_suspended INTEGER
+    prod_suspended INTEGER,
+    prod_sale_retention INTEGER
     )''';
     await dbClient.rawQuery(sSQL);
     
@@ -116,6 +117,42 @@ class produkDAO {
     }
     return listproduk;
   }
+
+  Future<List<produk>> SearchItemKasir(String cari) async {
+    var dbClient = await DBHelper().setDb();
+    
+    // String sSQLdrop ="alter table produk add column prod_sale_retention INTEGER default 0";
+    // await dbClient.rawQuery(sSQLdrop);
+    
+    
+    String sSQL = '''select * from produk 
+              left join kategori
+              on kat_id = prod_kat_id 
+              where prod_nama like "%${cari}%"
+              order by prod_sale_retention desc''';
+    List<Map> datalist = await dbClient.rawQuery(sSQL);
+    List<produk> listproduk = new List();
+
+    for (var i = 0; i < datalist.length; i++) {
+      var row = new produk(
+        datalist[i]['prod_nama'].toString(),
+        datalist[i]['prod_kat_id'],
+        datalist[i]['prod_barcode'].toString(),
+        datalist[i]['prod_img'].toString(),
+        datalist[i]['prod_countable'],
+        datalist[i]['prod_stock'],
+        datalist[i]['prod_price'],
+        datalist[i]['prod_cogs'],
+        datalist[i]['prod_suspended'],
+        kat_nama: datalist[i]['kat_nama'],
+        komisi_kat:datalist[i]['kat_komisi']
+      );
+      listproduk.add(row);
+      row.setId(datalist[i]["prod_id"]);
+    }
+    return listproduk;
+  }
+
   Future<int> saveProd(produk prod) async {
     var dbClient = await DBHelper().setDb();
     print("saveprod");
