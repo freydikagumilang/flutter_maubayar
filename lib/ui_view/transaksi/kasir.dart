@@ -21,7 +21,6 @@ import 'package:intl/intl.dart';
 import 'package:maubayar/ui_view/transaksi/printnota.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter_bluetooth_basic/flutter_bluetooth_basic.dart';
-import 'package:system_setting/system_setting.dart';
 
 class Kasir extends StatefulWidget {
   @override
@@ -415,6 +414,7 @@ class _KasirCheckoutState extends State<KasirCheckout> {
   void initState() {
     // TODO: implement initState
     global_var.isSaved = 0;
+    _newInvNo = "INV" + DateTime.now().millisecondsSinceEpoch.toString();
     gb.getPref("nama_bisnis").then((val) {
       _nama_bisnis = val;
       setState(() {});
@@ -435,11 +435,15 @@ class _KasirCheckoutState extends State<KasirCheckout> {
       _default_printer = val;
       setState(() {});
     });
+    gb.getPref("cetak_nota").then((val) {
+      global_var.cetak_nota = (val == "1");
+      setState(() {});
+    });
+    
   }
 
   @override
   Widget build(BuildContext context) {
-    int bl_stat = 1;
     CreateNota _creatorNota = BlocProvider.of<CreateNota>(context);
     CreateBukuKas _creatorBukukas = BlocProvider.of<CreateBukuKas>(context);
     return Container(
@@ -481,7 +485,7 @@ class _KasirCheckoutState extends State<KasirCheckout> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("5480653458", style: TextStyle(fontSize: 16)),
+                          Text(_newInvNo, style: TextStyle(fontSize: 16)),
                           Text("01-Jan-2021", style: TextStyle(fontSize: 16)),
                           GestureDetector(
                               onTap: () {
@@ -819,88 +823,53 @@ class _KasirCheckoutState extends State<KasirCheckout> {
                 borderRadius: BorderRadius.circular(20.0),
               ),
               onPressed: () async {
-                _bluetoothManager.state.listen((val) {
-                  if (!mounted) return;
-                  if (val == 10) {
-                    bl_stat = 0;
-                    AlertDialog checkbluetooth = AlertDialog(
-                      title: Text(
-                        "Bluetooth Nonaktif",
-                        style: TextStyle(fontWeight: FontWeight.w700),
-                      ),
-                      content: Container(
-                        height: MediaQuery.of(context).size.height / 15,
-                        child: Text(
-                            "Harap aktifkan Bluetooth anda untuk terhubung ke printer "),
-                      ),
-                    );
-                    showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return checkbluetooth;
-                        });
-                  } else if (val == 12) {
-                    if (global_var.isSaved == 0) {
-                      _newInvNo = "INV" +
-                          DateTime.now().millisecondsSinceEpoch.toString();
-                      int _unixtime = DateTime.now().millisecondsSinceEpoch;
-                      int _unixtime_today = global_var.unixtime_today;
+                if (global_var.isSaved == 0) {
+                  int _unixtime = DateTime.now().millisecondsSinceEpoch;
+                  int _unixtime_today = global_var.unixtime_today;
 
-                      invoice newInvoice = invoice(
-                          _newInvNo,
-                          DateTime.now().toString(),
-                          global_var.kasirpelanggan.pelanggan_id,
-                          global_var.total,
-                          global_var.diskon,
-                          global_var.total - global_var.diskon,
-                          _unixtime,
-                          0,
-                          _unixtime,
-                          details: global_var.detailkasir);
-                      // _creatorNota.add(newInvoice); // Simpan Nota
-                      bukukasdet _bukukasdet = bukukasdet(
-                          ((global_var.isTunai == 1)
-                              ? global_var.pembayaran
-                              : 0),
-                          ((global_var.isTunai == 0)
-                              ? global_var.pembayaran
-                              : 0),
-                          "Penjualan Nota : {$_newInvNo}",
-                          _unixtime_today,
-                          _unixtime,
-                          0);
+                  invoice newInvoice = invoice(
+                      _newInvNo,
+                      DateTime.now().toString(),
+                      global_var.kasirpelanggan.pelanggan_id,
+                      global_var.total,
+                      global_var.diskon,
+                      global_var.total - global_var.diskon,
+                      _unixtime,
+                      0,
+                      _unixtime,
+                      details: global_var.detailkasir);
+                  _creatorNota.add(newInvoice); // Simpan Nota
+                  bukukasdet _bukukasdet = bukukasdet(
+                      ((global_var.isTunai == 1) ? global_var.pembayaran : 0),
+                      ((global_var.isTunai == 0) ? global_var.pembayaran : 0),
+                      "Penjualan Nota : {$_newInvNo}",
+                      _unixtime_today,
+                      _unixtime,
+                      0);
 
-                      bukukas _bukukas = bukukas(
-                          ((global_var.isTunai == 1)
-                              ? global_var.pembayaran
-                              : 0),
-                          ((global_var.isTunai == 0)
-                              ? global_var.pembayaran
-                              : 0),
-                          _unixtime_today,
-                          _unixtime,
-                          0,
-                          detail_bukukas: _bukukasdet);
-                      // _creatorBukukas.add(_bukukas); // saving buku kas
-                      global_var.isSaved = 1;
-                      setState(() {}); 
-                      print("isSaved:"+global_var.isSaved.toString());
-                    }
-                    if (global_var.default_printer == null) {
-                      Navigator.of(context)
-                          .push(
-                              MaterialPageRoute(builder: (_) => CariPrinter()))
-                          .then((value) {
-                        if (global_var.default_printer != null)
-                          _startPrint(global_var.default_printer);
-                      });
-                    } else {
-                      _startPrint(global_var.default_printer);
-                    }
-                  }
-                });
+                  bukukas _bukukas = bukukas(
+                      ((global_var.isTunai == 1) ? global_var.pembayaran : 0),
+                      ((global_var.isTunai == 0) ? global_var.pembayaran : 0),
+                      global_var.unixtime_today, //get today at 00:00:00
+                      global_var.unixtime_today, //get today at 00:00:00
+                      0,
+                      detail_bukukas: _bukukasdet);
+                  _creatorBukukas.add(_bukukas); // saving buku kas
+                  global_var.isSaved = 1;
+                  setState(() {});
+                  print("isSaved:" + global_var.isSaved.toString());
+                } else {
+                  print("Sudah Tersimpan");
+                }
+                if (global_var.cetak_nota) {
+                  _search_print();
+                } else {
+                  print("tidak perlu cetak");
+                  gb.ClearKasir();
+                  setState(() {});
+                }
               },
-              color: Colors.amber[700],
+              color: FitnessAppTheme.yellow,
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Row(
@@ -916,6 +885,50 @@ class _KasirCheckoutState extends State<KasirCheckout> {
         ],
       ),
     );
+  }
+
+  void _search_print() {
+    _bluetoothManager.state.listen((val) {
+      if (!mounted) return;
+      if (val == 10) {
+        AlertDialog checkbluetooth = AlertDialog(
+          title: Text(
+            "Bluetooth Nonaktif",
+            style: TextStyle(fontWeight: FontWeight.w700),
+          ),
+          content: Container(
+            height: MediaQuery.of(context).size.height / 15,
+            child: Text(
+                "Harap aktifkan Bluetooth anda untuk terhubung ke printer, jika Anda ingin mencetak nota"),
+          ),
+          actions: [
+            FlatButton(
+                onPressed: null,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                color: FitnessAppTheme.yellow,
+                child: Text("Tidak Mencetak"))
+          ],
+        );
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return checkbluetooth;
+            });
+      } else if (val == 12) {
+        if (global_var.default_printer == null) {
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (_) => CariPrinter()))
+              .then((value) {
+            if (global_var.default_printer != null)
+              _startPrint(global_var.default_printer);
+          });
+        } else {
+          _startPrint(global_var.default_printer);
+        }
+      }
+    });
   }
 
   Future<void> _startPrint(PrinterBluetooth selprinter) async {
@@ -944,11 +957,11 @@ class _KasirCheckoutState extends State<KasirCheckout> {
     ticket.emptyLines(1);
     ticket.row([
       PosColumn(
-        text: 'No',
+        text: 'No.Inv',
         width: 4,
       ),
       PosColumn(
-        text: 'INV-47326489',
+        text: _newInvNo,
         width: 8,
       ),
     ]);

@@ -16,6 +16,7 @@ class global_var {
   static List<invoicedet> detailkasir;
   static PrinterBluetooth default_printer;
   static int unixtime_today = formatter.parse(formatter.format(DateTime.now())).millisecondsSinceEpoch ;
+  static bool cetak_nota=false;
   void savePref(String variable, String isi )async{
     SharedPreferences _shp = await SharedPreferences.getInstance();
     await _shp.setString(variable, isi);
@@ -24,6 +25,16 @@ class global_var {
     SharedPreferences _shp = await SharedPreferences.getInstance();
     var _ambiltext = await _shp.getString(variable)?? "";
     return _ambiltext;
+  }
+  void ClearKasir(){
+    diskon=0;
+    pembayaran=0;
+    kembalian=0;
+    total=0;
+    detailkasir=[];
+    isTunai=1;
+    kasirpelanggan=null;
+    isSaved=0;
   }
   
 }

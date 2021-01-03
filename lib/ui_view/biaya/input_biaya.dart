@@ -3,6 +3,7 @@ import 'package:maubayar/fintness_app_theme.dart';
 import 'package:maubayar/main.dart';
 import 'package:maubayar/ui_view/template/frxappbar.dart';
 import 'package:intl/intl.dart';
+
 class InputBiaya extends StatefulWidget {
   @override
   _InputBiayaState createState() => _InputBiayaState();
@@ -24,11 +25,11 @@ class _InputBiayaState extends State<InputBiaya> {
       },
       child: Scaffold(
         backgroundColor: FitnessAppTheme.tosca,
-        appBar: FrxAppBar("Biaya", backroute: "/dashboard"),
+        appBar: FrxAppBar("Kas", backroute: "/dashboard"),
         body: Container(
           padding: EdgeInsets.all(8),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               GestureDetector(
                 onTap: () async {
@@ -53,7 +54,54 @@ class _InputBiayaState extends State<InputBiaya> {
                       color: FitnessAppTheme.white),
                 ),
               ),
-              
+              Wrap(
+                runSpacing: 1.0,
+                spacing: 5.0,
+                children: [
+                  RaisedButton(
+                    onPressed: () {},
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    color: FitnessAppTheme.white,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("Tambah Data",
+                          style: TextStyle(
+                              color: FitnessAppTheme.tosca, fontSize: 18)),
+                    ),
+                  ),
+                  RaisedButton(
+                    onPressed: () {},
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    color: FitnessAppTheme.redtext,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("Biaya",
+                          style: TextStyle(
+                              color: FitnessAppTheme.white, fontSize: 18)),
+                    ),
+                  ),
+                  RaisedButton(
+                    onPressed: () {},
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    color: FitnessAppTheme.yellow,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("Pendapatan",
+                          style: TextStyle(
+                              color: FitnessAppTheme.white, fontSize: 18)),
+                    ),
+                  ),
+                ],
+              )
             ],
           ),
         ),

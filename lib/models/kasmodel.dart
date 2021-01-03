@@ -120,14 +120,16 @@ class bukukasDAO {
                   bukukasdet_created_at integer,bukukasdet_updated_at integer DEFAULT 0 ,bukukasdet_deleted_at integer DEFAULT 0  )''';
 
     await dbClient.rawQuery(sSQLdet);
-
+    int _start_date = tgl[0];
+    int _end_date = tgl[1];
     sSQL = '''select * 
-    from bukukas where bukukas_created_at between {$tgl[0]} and {$tgl[1]}''';
+    from bukukas where bukukas_created_at between $_start_date  and $_end_date''';
 
     List<Map> datalist = await dbClient.rawQuery(sSQL);
     List<bukukas> _bukukas = new List();
 
     for (var i = 0; i < datalist.length; i++) {
+      print(datalist[i]['bukukas_tunai']);
       var row = new bukukas(
         datalist[i]['bukukas_tunai'],
         datalist[i]['bukukas_non_tunai'],
@@ -179,7 +181,7 @@ class bukukasDAO {
     
 
     String sSQL = '''select * 
-    from bukukasdet where bukukasdet_created_at between {$tgl[0]} and {$tgl[1]}''';
+    from bukukasdet where bukukasdet_created_at between $tgl[0] and $tgl[1]''';
 
     List<Map> datalist = await dbClient.rawQuery(sSQL);
     List<bukukasdet> _bukukasdet = new List();

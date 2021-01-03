@@ -66,52 +66,54 @@ class _InputFormKapsterState extends State<InputFormKapster> {
     return Card(
       child: Padding(
         padding: EdgeInsets.all(8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextFormField(
-                style: TextStyle(fontSize: 20),
-                controller: txtNamaPlg,
-                decoration: InputDecoration(
-                    labelText: 'Nama',
-                    focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: FitnessAppTheme.tosca)))),
-            TextFormField(
-                style: TextStyle(fontSize: 20),
-                controller: txtHP,
-                decoration: InputDecoration(
-                    labelText: 'No.Handphone',
-                    focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: FitnessAppTheme.tosca)))),
-            TextFormField(
-                style: TextStyle(fontSize: 20),
-                controller: txtAlamat,
-                decoration: InputDecoration(
-                    labelText: 'Alamat',
-                    focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: FitnessAppTheme.tosca)))),
-            FlatButton(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
-                color: FitnessAppTheme.tosca,
-                onPressed: () {
-                  kapster newplg =
-                      kapster(txtNamaPlg.text, txtHP.text.toString(), txtAlamat.text);
-                  if (widget.editplg != null) {
-                    newplg.setId(widget.editplg.kapster_id);
-                  }
-                  Createkapster creator = Createkapster("");
-                  creator.add(newplg);
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Kapster()));
-                },
-                child: Text(
-                  "Simpan",
-                  style:
-                      TextStyle(fontSize: 18.0, color: FitnessAppTheme.white),
-                ))
-          ],
+        child: SingleChildScrollView(
+                  child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextFormField(
+                  style: TextStyle(fontSize: 20),
+                  controller: txtNamaPlg,
+                  decoration: InputDecoration(
+                      labelText: 'Nama',
+                      focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: FitnessAppTheme.tosca)))),
+              TextFormField(
+                  style: TextStyle(fontSize: 20),
+                  controller: txtHP,
+                  decoration: InputDecoration(
+                      labelText: 'No.Handphone',
+                      focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: FitnessAppTheme.tosca)))),
+              TextFormField(
+                  style: TextStyle(fontSize: 20),
+                  controller: txtAlamat,
+                  decoration: InputDecoration(
+                      labelText: 'Alamat',
+                      focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: FitnessAppTheme.tosca)))),
+              FlatButton(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                  color: FitnessAppTheme.tosca,
+                  onPressed: () {
+                    kapster newplg =
+                        kapster(txtNamaPlg.text, txtHP.text.toString(), txtAlamat.text);
+                    if (widget.editplg != null) {
+                      newplg.setId(widget.editplg.kapster_id);
+                    }
+                    Createkapster creator = Createkapster("");
+                    creator.add(newplg);
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Kapster()));
+                  },
+                  child: Text(
+                    "Simpan",
+                    style:
+                        TextStyle(fontSize: 18.0, color: FitnessAppTheme.white),
+                  ))
+            ],
+          ),
         ),
       ),
     );

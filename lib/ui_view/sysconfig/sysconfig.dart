@@ -4,6 +4,7 @@ import 'package:maubayar/fintness_app_theme.dart';
 import 'package:maubayar/global_var.dart';
 import 'package:maubayar/main.dart';
 import 'package:maubayar/ui_view/template/frxappbar.dart';
+import 'package:flutter_bluetooth_basic/flutter_bluetooth_basic.dart';
 
 class SysConfig extends StatefulWidget {
   @override
@@ -266,24 +267,61 @@ class _PrinterConfigState extends State<PrinterConfig> {
   global_var gb = global_var();
   String _printer_id = "";
   PrinterBluetoothManager _printManager = PrinterBluetoothManager();
+  BluetoothManager _bluetoothManager = BluetoothManager.instance;
   List<PrinterBluetooth> _device = [];
+  bool _using_printer = true;
 
   void searchPrinter() {
-    _printManager.startScan(Duration(seconds: 2));
-    _printManager.scanResults.listen((printers) {
+    _bluetoothManager.state.listen((val) {
       if (!mounted) return;
-      setState(() => _device = printers);
+      if (val == 10) {
+        AlertDialog checkbluetooth = AlertDialog(
+          title: Text(
+            "Bluetooth Nonaktif",
+            style: TextStyle(fontWeight: FontWeight.w700),
+          ),
+          content: Container(
+            height: MediaQuery.of(context).size.height / 15,
+            child: Text(
+                "Harap aktifkan Bluetooth anda untuk terhubung ke printer, jika Anda ingin mencetak nota"),
+          ),
+          actions: [
+            FlatButton(
+                onPressed: null,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                color: FitnessAppTheme.yellow,
+                child: Text("Tidak Mencetak"))
+          ],
+        );
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return checkbluetooth;
+            });
+      } else if (val == 12) {
+        _printManager.startScan(Duration(seconds: 2));
+        _printManager.scanResults.listen((printers) {
+          if (!mounted) return;
+          setState(() => _device = printers);
+        });
+      }
     });
   }
 
   @override
   void initState() {
     // TODO: implement initState
-    searchPrinter();
     gb.getPref("printer_id").then((val) {
       _printer_id = val;
       setState(() {});
     });
+    gb.getPref("cetak_nota").then((val) {
+      _using_printer = (val=="1");
+      setState(() {});
+    });
+    searchPrinter();
   }
 
   @override
@@ -305,37 +343,72 @@ class _PrinterConfigState extends State<PrinterConfig> {
           ),
           body: Container(
             padding: EdgeInsets.fromLTRB(20, 10, 10, 10),
-            child: ListView.separated(
-              itemCount: _device.length,
-              itemBuilder: (context, idx) {
-                return ListTile(
-                    onTap: () {
-                      gb.savePref("printer_id", _device[idx].address);
-                      Navigator.of(context).pop();
-                    },
-                    title: Text(
-                      _device[idx].name,
-                      style:
-                          TextStyle(color: FitnessAppTheme.white, fontSize: 22),
-                    ),
-                    subtitle: Text(_device[idx].address,
-                        style: TextStyle(color: FitnessAppTheme.white)),
-                    leading: Icon(
-                      Icons.print,
-                      color: FitnessAppTheme.white,
-                      size: 30,
-                    ),
-                    trailing: (_printer_id != "")
-                        ? Icon(
-                            Icons.check_circle,
-                            color: FitnessAppTheme.yellow,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Switch(
+                        activeColor: FitnessAppTheme.white,
+                        inactiveTrackColor: FitnessAppTheme.nearlyBlack,
+                        inactiveThumbColor: FitnessAppTheme.darkText,
+                        value: _using_printer,
+                        onChanged: (newVal) {
+                          setState(() {
+                            _using_printer = newVal;
+                            gb.savePref("cetak_nota", (newVal)?"1":"0");
+                          });
+                        }),
+                        Text("Mencetak Nota Setelah Simpan",style: TextStyle(fontSize: 18,color: FitnessAppTheme.white),),
+                        
+                        
+                  ],
+                ),
+                Divider(
+                        color: FitnessAppTheme.white,
+                      ),
+                Text("Daftar Printer Bluetooth",style: TextStyle(fontSize: 20,color: FitnessAppTheme.white),),
+                Divider(
+                        color: FitnessAppTheme.white,
+                      ),
+                Expanded(
+                  child: ListView.separated(
+                    itemCount: _device.length,
+                    itemBuilder: (context, idx) {
+                      return ListTile(
+                          onTap: () {
+                            gb.savePref("printer_id", _device[idx].address);
+                            Navigator.of(context).pop();
+                          },
+                          title: Text(
+                            _device[idx].name,
+                            style: TextStyle(
+                                color: FitnessAppTheme.white, fontSize: 20),
+                          ),
+                          subtitle: Text(_device[idx].address,
+                              style: TextStyle(color: FitnessAppTheme.white)),
+                          leading: Icon(
+                            Icons.print,
+                            color: FitnessAppTheme.white,
                             size: 30,
-                          )
-                        : Text(""));
-              },
-              separatorBuilder: (context, index) {
-                return Divider(color: FitnessAppTheme.white,);
-              },
+                          ),
+                          trailing: (_printer_id != "" &&
+                                  _printer_id == _device[idx].address)
+                              ? Icon(
+                                  Icons.check_circle,
+                                  color: FitnessAppTheme.yellow,
+                                  size: 30,
+                                )
+                              : Text(""));
+                    },
+                    separatorBuilder: (context, index) {
+                      return Divider(
+                        color: FitnessAppTheme.white,
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
         ));
