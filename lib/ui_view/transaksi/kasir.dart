@@ -863,8 +863,9 @@ class _KasirCheckoutState extends State<KasirCheckout> {
                 }
                 if (global_var.cetak_nota) {
                   _search_print();
+                  
                 } else {
-                  print("tidak perlu cetak");
+                  //print("tidak perlu cetak");
                   gb.ClearKasir();
                   setState(() {});
                 }
@@ -887,7 +888,7 @@ class _KasirCheckoutState extends State<KasirCheckout> {
     );
   }
 
-  void _search_print() {
+  Future <void> _search_print() async{
     _bluetoothManager.state.listen((val) {
       if (!mounted) return;
       if (val == 10) {
@@ -922,10 +923,10 @@ class _KasirCheckoutState extends State<KasirCheckout> {
               .push(MaterialPageRoute(builder: (_) => CariPrinter()))
               .then((value) {
             if (global_var.default_printer != null)
-              _startPrint(global_var.default_printer);
+              _startPrint(global_var.default_printer).then((value) => gb.ClearKasir());
           });
         } else {
-          _startPrint(global_var.default_printer);
+          _startPrint(global_var.default_printer).then((value) => gb.ClearKasir());
         }
       }
     });

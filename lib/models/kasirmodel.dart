@@ -170,16 +170,24 @@ class invoicedet {
   }
 }
 
+class salesperday {
+  int _sale_date;
+  double _sale_total;
+  salesperday(this._sale_date, this._sale_total);
+
+  salesperday.map(dynamic obj) {
+    this._sale_date = obj["saledate"];
+    this._sale_total = obj["saletotal"];
+  }
+
+  int get saledate => _sale_date;
+  double get saletotal => _sale_total;
+}
+
 class invoiceDAO {
   Future<List<invoice>> getInv(String cari) async {
     var dbClient = await DBHelper().setDb();
-    String sSQL =
-        '''Create table IF NOT EXISTS invoice (inv_id INTEGER PRIMARY KEY autoincrement,inv_no string,inv_plg_id int,
-                  inv_date string, inv_total_bruto real, inv_diskon real,inv_total_net real,
-                  inv_paid real,inv_iscash integer,inv_created_at integer,inv_updated_at integer DEFAULT 0 ,inv_deleted_at integer DEFAULT 0  )''';
-
-    await dbClient.rawQuery(sSQL);
-    sSQL = '''select * 
+    String sSQL = '''select * 
     from invoice 
     inner join pelanggan
       on inv_plg_id = pelanggan_id
@@ -235,14 +243,12 @@ class invoiceDAO {
 
       await _details[i].setInvId(res);
       await dbClient.insert("invoicedet", _details[i].toMap());
-      
 
-      sSQLdet = '''update produk set prod_sale_retention = prod_sale_retention + 1
+      sSQLdet =
+          '''update produk set prod_sale_retention = prod_sale_retention + 1
                 where prod_id = $_prod_id ''';
       print(sSQLdet);
       await dbClient.rawQuery(sSQLdet);
-
-
     }
     return res;
   }
@@ -289,7 +295,6 @@ class invoiceDAO {
     List<invoicedet> list_invdet = new List();
 
     for (var i = 0; i < datalist.length; i++) {
-
       var row = new invoicedet(
         datalist[i]['invdet_inv_id'],
         datalist[i]['invdet_item_id'],
@@ -311,5 +316,42 @@ class invoiceDAO {
       row.setId(datalist[i]["invdet_id"]);
     }
     return list_invdet;
+  }
+
+  Future<List<salesperday>> GetSalelast7Days(List<int> cari) async {
+    var dbClient = await DBHelper().setDb();
+    String sSQL =
+        '''Create table IF NOT EXISTS invoice (inv_id INTEGER PRIMARY KEY autoincrement,inv_no string,inv_plg_id int,
+                  inv_date string, inv_total_bruto real, inv_diskon real,inv_total_net real,
+                  inv_paid real,inv_iscash integer,inv_created_at integer,inv_updated_at integer DEFAULT 0 ,inv_deleted_at integer DEFAULT 0  )''';
+
+    await dbClient.rawQuery(sSQL);
+
+    List<salesperday> _sales7days = [];
+    int _start_date = 0;
+    int _end_date = 0;
+    salesperday baris;
+    for (int i = 0; i < cari.length; i+=2) {
+      _start_date = cari[i];
+      _end_date = cari[(i+1)];
+      sSQL =
+          '''select sum(inv_total_net) total,inv_created_at from invoice where inv_created_at between $_start_date and $_end_date; ''';
+
+      List<Map> datalist = await dbClient.rawQuery(sSQL);
+      
+      if (datalist[0]['total']!=null) {
+        baris = new salesperday(
+          datalist[0]['inv_created_at'],
+          datalist[0]['total'],
+        );
+        // print("found baris ke $i :"+baris.saletotal.toString());
+      } else {
+        baris = new salesperday(cari[i], 0);
+        // print("baris ke $i :"+baris.saletotal.toString());
+      }
+
+      _sales7days.add(baris);
+    }
+    return _sales7days;
   }
 }

@@ -129,7 +129,8 @@ class bukukasDAO {
     List<bukukas> _bukukas = new List();
 
     for (var i = 0; i < datalist.length; i++) {
-      print(datalist[i]['bukukas_tunai']);
+      // print(datalist[i]['bukukas_tunai']);
+      // print(_start_date.toString()+" = "+datalist[i]['bukukas_created_at'].toString());
       var row = new bukukas(
         datalist[i]['bukukas_tunai'],
         datalist[i]['bukukas_non_tunai'],

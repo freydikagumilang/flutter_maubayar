@@ -16,6 +16,7 @@ class global_var {
   static List<invoicedet> detailkasir;
   static PrinterBluetooth default_printer;
   static int unixtime_today = formatter.parse(formatter.format(DateTime.now())).millisecondsSinceEpoch ;
+  static int unixtime_yesterday = formatter.parse(formatter.format(DateTime.now().subtract(Duration(days: 1)))).millisecondsSinceEpoch ;
   static bool cetak_nota=false;
   void savePref(String variable, String isi )async{
     SharedPreferences _shp = await SharedPreferences.getInstance();
